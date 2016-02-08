@@ -1,15 +1,15 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 assert cap.isOpened(), 'No cam'
 
 flag, frame = cap.read()
 
 loop = True
 
-lower_thresh = np.array([100, 70, 60], dtype=np.uint8)
-upper_thresh = np.array([130, 255, 255], dtype=np.uint8)
+lower_thresh = np.array([0, 0, 0], dtype=np.uint8)
+upper_thresh = np.array([180, 255, 255], dtype=np.uint8)
 chooseMode = 0
 adjustVal = 10
 
