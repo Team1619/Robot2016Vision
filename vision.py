@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from VisionFinal import vertexMath
+from coordinateCalculator import vertexMath
 import subprocess
 
 class cvImgAnalysis:
@@ -11,9 +11,9 @@ class cvImgAnalysis:
         assert self.cap.isOpened(), 'No cam'
         self.lowerThresh = lowerThresh
         self.upperThresh = upperThresh
-        subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
+#        subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
         self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight)
-        
+
     def getVertexData(self, coords):
         return self.targetTrig.getVertexData(coords)
 
@@ -25,8 +25,8 @@ class cvImgAnalysis:
         elif displayCam:
             self.drawContours(img, [cont], displayCam=True)
         if cont.shape[0] == 4:
-            return (True, self.sortCoords(cont, True, printVals=printVals), self.getCenterX(cont))
-        return False, [0], -1
+            return (True, self.sortCoords(cont, True, printVals=printVals), self.getCenterX(cont), self.getCenterY(cont))
+        return False, [0], -1, -1
 
     def sortCoords(self, cont, clockWise=False, printVals=False):
         coords = np.reshape(cont, (4, 2)).tolist()
@@ -52,6 +52,13 @@ class cvImgAnalysis:
     def getCenterX(self, cont):
         moment = cv2.moments(cont)
         return int(moment['m10']/moment['m00'])
+
+    def getCenterY(self, cont):
+        moment = cv2.moments(cont)
+        return int(moment['m01']/moment['m00'])
+
+    def getAngleOffsetToAlignedCG(self, centerX):
+        return self.targetTrig.getAngleToCentralX(centerX)
 
     def getContours(self, img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE, maxCont=True, printVals=False):
         contours, hierarchy = cv2.findContours(img.copy(), mode, method)

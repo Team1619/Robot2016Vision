@@ -1,10 +1,11 @@
 import math
 class vertexMath:
-	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0):
+	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = 6.375):
+		self.magicConstant1 = 1.0068230038038
 		self.height = height*1.0
 		self.centerH = height/2*1.0
-		self.width = width*1.0
-		self.centerW = width/2*1.0
+		self.width = width*self.magicConstant1
+		self.centerW = (width*self.magicConstant1)/2.0
 		self.focalLength = focalLength*1.0
 		self.targetHeight = targetHeight*1.0
 		self.targetWidth = targetWidth*1.0
@@ -12,6 +13,7 @@ class vertexMath:
 		self.armHeight = armHeight*1.0
 		self.acceptableError = 0.001
 		self.desiredDistance = 100.0
+		self.armSideOffset = armSideOffset
 	
 	def setHeight(self, h):
 		self.height = h
@@ -27,10 +29,8 @@ class vertexMath:
 	def getVertexData(self, intCoords, armAngle=15.0):
 
 		accurate = True
-
-
 			
-		vertices = [[(intCoords[0][0]*1.0), (intCoords[0][1]*1.0)], [(intCoords[1][0]*1.0), (intCoords[1][1]*1.0)], [(intCoords[2][0]*1.0), (intCoords[2][1]*1.0)], [(intCoords[3][0]*1.0), (intCoords[3][1]*1.0)]]
+		vertices = [[(intCoords[0][0]*self.magicConstant1), (intCoords[0][1]*1.0)], [(intCoords[1][0]*self.magicConstant1), (intCoords[1][1]*1.0)], [(intCoords[2][0]*self.magicConstant1), (intCoords[2][1]*1.0)], [(intCoords[3][0]*self.magicConstant1), (intCoords[3][1]*1.0)]]
 
 		for a16 in range(0,4,1):
 			if( vertices[a16][0] == self.centerW):
@@ -176,12 +176,12 @@ class vertexMath:
 		qT2 = self.getSecondScalar(offsetT, qT1, upperLeftVector, upperRightVector)
 
 		qTR = (qR2 + qT2)/2
-		qUR = (qU2 + qR1)/2
+		qUR = (qR1 + qU2)/2
 		qUL = (qL1 + qU1)/2
 		qTL = (qL2 + qT1)/2
 
 		qTRError = (qR2 - qT2)
-		qURError = (qU2 - qR1)
+		qURError = (qR1 - qU2)
 		qULError = (qL1 - qU1)
 		qTLError = (qL2 - qT1)
 
@@ -235,13 +235,16 @@ class vertexMath:
 		#print lowerRightIRLVector
 		#print lowerLeftIRLVector
 		#print upperLeftIRLVector
-
-		distanceToCenter = ((upperRightIRLVector[0] + lowerRightIRLVector[0] + lowerLeftIRLVector[0] + upperLeftIRLVector[0])/4)
+		
+		#distanceToCenter = self.hypot3D(((upperRightIRLVector[0] + lowerRightIRLVector[0] + lowerLeftIRLVector[0] + upperLeftIRLVector[0])/4), ((upperRightIRLVector[1] + lowerRightIRLVector[1] + lowerLeftIRLVector[1] + upperLeftIRLVector[1])/4), ((upperRightIRLVector[2] + lowerRightIRLVector[2] + lowerLeftIRLVector[2] + upperLeftIRLVector[2])/4))
 
 		leftMidpoint = [(upperLeftIRLVector2[0] + lowerLeftIRLVector2[0])/2, (upperLeftIRLVector2[1] + lowerLeftIRLVector2[1])/2, (upperLeftIRLVector2[2] + lowerLeftIRLVector2[2])/2]
 		rightMidpoint = [(upperRightIRLVector2[0] + lowerRightIRLVector2[0])/2, (upperRightIRLVector2[1] + lowerRightIRLVector2[1])/2, (upperRightIRLVector2[2] + lowerRightIRLVector2[2])/2]
 		
 		#horizontalAngle = 90.0 - math.degrees(math.atan2(math.hypot((leftMidpoint[1]-rightMidpoint[1]), (leftMidpoint[2]-rightMidpoint[2])), (leftMidpoint[0]-rightMidpoint[0])))
+
+		#print [qTRError, qURError, qULError, qTLError]
+		#print distanceToCenter
 
 		horizontalAngle = 90.0 - math.degrees(math.atan2((rightMidpoint[1]-leftMidpoint[1]), (leftMidpoint[0]-rightMidpoint[0])))
 
@@ -251,16 +254,32 @@ class vertexMath:
 
 		vertices3D = [upperRightIRLVector, lowerRightIRLVector, lowerLeftIRLVector, upperLeftIRLVector]
 		verticesT3D = self.transformCoordinates(vertices3D, armAngle)
+
+		centralVector = [((verticesT3D[0][0] + verticesT3D[1][0] + verticesT3D[2][0] + verticesT3D[3][0])/4), ((verticesT3D[0][1] + verticesT3D[1][1] + verticesT3D[2][1] + verticesT3D[3][1])/4), ((verticesT3D[0][2] + verticesT3D[1][2] + verticesT3D[2][2] + verticesT3D[3][2])/4)]
+
+		distanceToCenter = self.hypot3D(centralVector[0], centralVector[1], centralVector[2])
+
 		targetPosition = self.getTargetPosition(verticesT3D)
 		angleToTargetPosition = math.degrees(math.atan2((targetPosition[1]), targetPosition[0]))
 		distanceToTargetPosition = math.hypot(targetPosition[0], targetPosition[1])
 
+		if(angleToTargetPosition > 90):
+			angleToTargetPosition -= 180
+			distanceToTargetPosition *= -1
+
+		if(angleToTargetPosition < 90):
+			angleToTargetPosition += 180
+			distanceToTargetPosition *= -1
+
 		#print accurate
 		#return vertices3D
 
+		horizontalAngleToCenter = math.atan2((0-centralVector[1]), centralVector[0])
+		verticalAngleToCenter = math.atan2((0-centralVector[2]), centralVector[0])
+
 		#print accurate, distanceToCenter, horizontalAngle, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 
-                return accurate, distanceToCenter, horizontalAngle, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+                return accurate, distanceToCenter, horizontalAngle, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 		
 		#robotPivotUpperRightVector = [(upperRightIRLVector[0] + self.armLength), (upperRightIRLVector[1]), (upperRightIRLVector[2] + self.armHeight)]
 		#robotPivotLowerRightVector = [(lowerRightIRLVector[0] + self.armLength), (lowerRightIRLVector[1]), (lowerRightIRLVector[2] + self.armHeight)]
@@ -276,24 +295,18 @@ class vertexMath:
 		for i in range(0,4):
 			vertexAngle = math.atan2(vertices[i][2], vertices[i][0]) + math.radians(angle)
 			vertexDistance = math.hypot(vertices[i][2], vertices[i][0])
-			newVertices[i] = [(math.cos(vertexAngle)*vertexDistance), vertices[i][1], (math.sin(vertexAngle)*vertexDistance)]
+			newVertices[i] = [(math.cos(vertexAngle)*vertexDistance), vertices[i][1] + self.armSideOffset, (math.sin(vertexAngle)*vertexDistance)]
 		return newVertices
 
 	def getTargetPosition(self, realVertices):
 		direction1 = [(realVertices[1][0]-realVertices[3][0]), (realVertices[1][1]-realVertices[3][1]), (realVertices[1][2]-realVertices[3][2])]
 		direction2 = [(realVertices[0][0]-realVertices[2][0]), (realVertices[0][1]-realVertices[2][1]), (realVertices[0][2]-realVertices[2][2])]
-		#print direction1
-		#print direction2
 		directionNormal = self.crossProduct(direction1, direction2)
 		center = [((realVertices[0][0] + realVertices[1][0] + realVertices[2][0] + realVertices[3][0])/4), ((realVertices[0][1] + realVertices[1][1] + realVertices[2][1] + realVertices[3][1])/4), ((realVertices[0][2] + realVertices[1][2] + realVertices[2][2] + realVertices[3][2])/4)]
 		normalScaleLength = self.hypot3D(directionNormal[0], directionNormal[1], directionNormal[2])
 		scalar = 0-(self.desiredDistance/normalScaleLength)
 		translation = [(directionNormal[0]*scalar), (directionNormal[1]*scalar), (directionNormal[2]*scalar)]
 		targetPosition = [(center[0] + translation[0]), (center[1] + translation[1]), (center[2] + translation[2])]
-		#print targetPosition, "\n"
-		#print directionNormal, "\n"
-		#print "dot product 1 ", self.dotProduct(direction1, directionNormal)
-		#print "dot product 2 ", self.dotProduct(direction2, directionNormal)
 		a12 = self.hypot3D(center[0], center[1], center[2])
 		b12 = self.hypot3D(targetPosition[0], targetPosition[1], targetPosition[2])
 		c12 = self.hypot3D((center[0] - targetPosition[0]), (center[1] - targetPosition[1]), (center[2] - targetPosition[2]))
@@ -301,7 +314,7 @@ class vertexMath:
 		return targetPosition
 
 	def getAngleToCentralX(self, centerX):
-		return(math.degrees(math.atan2((centerX - self.centerW), self.focalLength)))
+		return -math.degrees(math.atan2((centerX - self.centerW), self.focalLength))
 
 	def getEquation(self, point0, point1):
 		m = 1000000000
@@ -347,7 +360,7 @@ class vertexMath:
 #trig = vertexMath(720, 1080, 1116, 7.65625, 3.828125)
 #trig.getVertexData([[110.0,641.0],[155.0,255.0],[897.0,295.0],[894.0,696.0]])
 
-#targetTrig = vertexMath(640, 480, 732, 20.0, 14.0)
+targetTrig = vertexMath(640, 480, 732, 20.0, 14.0)
 #targetTrig.getVertexData([[340,226],[340,254],[300,254],[300,226]])
-#targetTrig.getVertexData([[467, 252], [471, 371], [279, 365], [292, 252]])
+targetTrig.getVertexData([[467, 252], [471, 371], [279, 365], [292, 252]])
 #targetTrig.getAngleToCentralX(320-732)
