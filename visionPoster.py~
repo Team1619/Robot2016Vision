@@ -69,7 +69,7 @@ class VisionPoster:
 
 
 if __name__ == '__main__':
-    #time.sleep(10)
+    time.sleep(10)
     poster = VisionPoster(640, 480, 732)
     while True:
         poster.getFrame()

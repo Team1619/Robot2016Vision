@@ -16,7 +16,7 @@ class cvImgAnalysis:
         #    self.cap = cv2.VideoCapture(cam)
         self.lowerThresh = lowerThresh
         self.upperThresh = upperThresh
-        #subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
+        subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
         self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight)
 
     def getVertexData(self, coords):

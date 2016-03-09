@@ -1,6 +1,6 @@
 import math
 class vertexMath:
-	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = 6.375):
+	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = -6.125):
 		self.magicConstant1 = 1.0068230038038
 		self.height = height*1.0
 		self.centerH = height/2*1.0
@@ -274,8 +274,8 @@ class vertexMath:
 		#print accurate
 		#return vertices3D
 
-		horizontalAngleToCenter = math.atan2((0-centralVector[1]), centralVector[0])
-		verticalAngleToCenter = math.atan2((0-centralVector[2]), centralVector[0])
+		horizontalAngleToCenter = math.degrees(math.atan2((0-centralVector[1]), centralVector[0]))
+		verticalAngleToCenter = math.degrees(math.atan2((0-centralVector[2]), centralVector[0]))
 
 		#print accurate, distanceToCenter, horizontalAngle, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 
