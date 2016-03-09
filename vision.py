@@ -7,7 +7,7 @@ import time
 class cvImgAnalysis:
     CAMERA_COMMAND = 'v4l2-ctl -c exposure_auto=1 -c exposure_absolute=5 -c backlight_compensation=0 -c sharpness=50 -c brightness=30 -c contrast=5'
 
-    def __init__(self, cam, lowerThresh, upperThresh, imgWidth, imgHeight, focal, realWidth, realHeight):
+    def __init__(self, cam, lowerThresh, upperThresh, imgWidth, imgHeight, focal, realWidth, realHeight, minContourArea):
         self.cap = cv2.VideoCapture(cam)
         assert self.cap.isOpened(), 'No cam'
         #while not self.cap.isOpened():
@@ -16,6 +16,7 @@ class cvImgAnalysis:
         #    self.cap = cv2.VideoCapture(cam)
         self.lowerThresh = lowerThresh
         self.upperThresh = upperThresh
+        self.minArea = minContourArea
         #subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
         self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight)
 
@@ -29,7 +30,7 @@ class cvImgAnalysis:
             self.drawContours(img, [cont], displayCam=False)
         elif displayCam:
             self.drawContours(img, [cont], displayCam=True)
-        if cont.shape[0] == 4:
+        if self.checkContour(cont):
             return (True, self.sortCoords(cont, True, printVals=printVals), self.getCenterX(cont), self.getCenterY(cont))
         return False, [0], -1, -1
 
@@ -42,6 +43,9 @@ class cvImgAnalysis:
         if printVals:
             print(coords)
         return coords
+
+    def checkContour(self, cont):
+        return cont.shape[0] == 4 and cv2.contourArea(cont) > self.minArea
 
     def coordsCompare(self, point1, point2):
         return point1[1] - point2[1] if point1[1] - point2[1] else point1[0] - point2[0]
