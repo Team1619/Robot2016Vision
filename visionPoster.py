@@ -15,8 +15,8 @@ from stabilizer import Stabilizer
 
 GOAL_WIDTH = 20.0
 GOAL_HEIGHT = 12.0
-CONTRAST_SCALE = 1.5
-BRIGHTNESS_INCREASE = 40
+CONTRAST_SCALE = 1.0
+BRIGHTNESS_INCREASE = 0
 MIN_CONTOUR_AREA = 100
 
 class VisionPoster:
@@ -65,6 +65,7 @@ class VisionPoster:
         if flag:
             self.camera.drawContours(frame, [numpy.array(coordinates).reshape((-1, 1, 2))], displayCam=False)
         frame = cv2.resize(frame, (0, 0), fx=0.234375, fy=0.234375)
+        frame = frame[::-1,::-1,:]
         frame = cv2.multiply(frame, numpy.array([CONTRAST_SCALE]))
         frame = cv2.add(frame, BRIGHTNESS_INCREASE)
         image = cv2.imencode('.jpg', frame)[1]
