@@ -8,9 +8,9 @@ import cv2
 
 class ImageReceiver:
 
-    BUFFER_SIZE = 4096
+    BUFFER_SIZE = 65535
 
-    def __init__(self, host='192.168.1.37', port=1619):
+    def __init__(self, host='192.168.1.126', port=1619):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.host = host
@@ -40,8 +40,11 @@ class ImageReceiver:
 
 if __name__ == '__main__':
     receiver = ImageReceiver()
-    img = numpy.fromstring(receiver.receiveImage(), dtype=numpy.uint8)
-    frame = cv2.imdecode(img, 1)
-    frame.reshape((240,320,3))
-    cv2.imshow('img', frame)
-    cv2.waitkey(1)
+    while True:
+        data = receiver.receiveImage()
+        img = numpy.fromstring(data, dtype=numpy.uint8)
+        frame = cv2.imdecode(img, 1)
+        frame = frame[:,::-1,:]
+        cv2.imshow('img', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
