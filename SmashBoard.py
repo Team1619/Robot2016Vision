@@ -133,7 +133,7 @@ class SmashBoard:
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard(host='192.168.1.158', port=1619)
+    smashBoard = SmashBoard(host='10.16.19.2', port=1619)
     #smashBoard = SmashBoard(port=8000)
     smashBoard.connect()
     smashBoard.startUpdateThread()

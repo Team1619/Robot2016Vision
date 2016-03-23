@@ -59,7 +59,7 @@ while loop:
     flag, frame = cap.read()
     assert flag, 'No frame'
 
-    frame = np.array(frame[::-1, ::-1, :])
+    frame = numpy.array(frame[::-1, ::-1, :])
 
     blurFrame = cv2.GaussianBlur(frame, (5, 5), 0)
     hsv = cv2.cvtColor(blurFrame, cv2.COLOR_BGR2HSV)

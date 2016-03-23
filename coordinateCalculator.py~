@@ -1,6 +1,6 @@
 import math
 class vertexMath:
-	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = 11.0):
+	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = -6.125):
 		self.magicConstant1 = 1.0068230038038
 		self.height = height*1.0
 		self.centerH = height/2*1.0

@@ -8,7 +8,9 @@ import scipy
 import cv2
 
 import netTable
-import stabilizer
+from smashBoard import SmashBoard
+from imageStreamer import ImageStreamer
+
 from vision import cvImgAnalysis
 from stabilizer import Stabilizer
 
@@ -22,7 +24,11 @@ MIN_CONTOUR_AREA = 100
 class VisionPoster:
 
     def __init__(self, width, height, focalLength):
-        self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
+        self.socketTable = SmashBoard(host='10.16.19.2')
+	self.socketTable.connect()
+	self.socketTable.startUpdateThread()
+        self.imageStreamer = ImageStreamer()
+	#self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
         self.camera = cvImgAnalysis(0, numpy.uint8([56, 100, 25]), numpy.uint8([112, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
         self.distanceStabilizer = Stabilizer(20, 10)
         #self.pivotalAngleStabilizer = Stabilizer(10, 7.5)
@@ -35,21 +41,28 @@ class VisionPoster:
 
     def getFrame(self):
         frame = self.camera.readFrame()
+        #frame = numpy.array(frame[::-1, ::-1, :])
         flag, coordinates, centerX, _ = self.camera.getCoords(False, False, frame)
         if flag:
             try:
                 _, distance, _, angleOffsetToAligned, _, _, _, _ = self.camera.getVertexData(coordinates)
                 if self.distanceStabilizer.push(distance):
-                    self.networkTable.putNumber('distance', self.distanceStabilizer.get())
+                    self.socketTable.setDouble('distance', self.distanceStabilizer.get())
                 #if self.pivotalAngleStabilizer.push(pivotalAngle):
                 #    self.networkTable.putNumber('pivotalAngle', self.pivotalAngleStabilizer.get())
                 if self.centerXStabilizer.push(centerX):
-                    self.networkTable.putNumber('centerX', self.centerXStabilizer.get())
+                    self.socketTable.setLong('centerX', self.centerXStabilizer.get())
                 #    self.networkTable.putNumber('angleOffsetToAlignedCG', self.camera.getAngleOffsetToAlignedCG(centerX))
                 #if self.centerYStabilizer.push(centerY):
                 #    self.networkTable.putNumber('centerY', self.centerYStabilizer.get())
                 if self.angleOffsetToAlignedStabilizer.push(angleOffsetToAligned):
-                    self.networkTable.putNumber('angleOffsetToAligned', self.angleOffsetToAlignedStabilizer.get())
+                    adjustedAngleOffset = self.angleOffsetToAlignedStabilizer.get() - 3
+                    if adjustedAngleOffset < 0:
+                        adjustedAngleOffset += (0.7/25) * adjustedAngleOffset
+                    else:
+                        adjustedAngleOffset += (0.7/13) * adjustedAngleOffset
+                    #print adjustedAngleOffset
+                    self.socketTable.setDouble('angleOffsetToAligned', adjustedAngleOffset)
                 #if self.verticalAngleStabilizer.push(verticalAngle):
                 #    self.networkTable.putNumber('verticalAngle', self.verticalAngleStabilizer.get())
                 #if self.distanceToOptimalStabilizer.push(distanceToOptimal):
@@ -58,18 +71,18 @@ class VisionPoster:
                 #    self.networkTable.putNumber('angleToOptimal', self.angleToOptimalStabilizer.get())
             except ZeroDivisionError:
                 print('Divide by zero error')
-        self.networkTable.putBoolean('contourFound', flag)
-        self.networkTable.putString('image', self.getSmashBoardImage(flag, coordinates, frame))
+        self.socketTable.setLong('contourFound', int(flag))
+        #self.socketTable.setString('image', self.getSmashBoardImage(flag, coordinates, frame))
+        self.imageStreamer.sendImage(self.getSmashBoardImage(flag, coordinates, frame))
 
     def getSmashBoardImage(self, flag, coordinates, frame):
         if flag:
             self.camera.drawContours(frame, [numpy.array(coordinates).reshape((-1, 1, 2))], displayCam=False)
-        frame = cv2.resize(frame, (0, 0), fx=0.234375, fy=0.234375)
-        frame = frame[::-1,::-1,:]
-        frame = cv2.multiply(frame, numpy.array([CONTRAST_SCALE]))
-        frame = cv2.add(frame, BRIGHTNESS_INCREASE)
-        image = cv2.imencode('.jpg', frame)[1]
-        return base64.b64encode(image)
+        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        #frame = cv2.multiply(frame, numpy.array([CONTRAST_SCALE]))
+        #frame = cv2.add(frame, BRIGHTNESS_INCREASE)
+        image = numpy.array(cv2.imencode('.jpg', frame)[1])
+        return image.tostring()
 
     def cleanUp(self):
         self.camera.release()
