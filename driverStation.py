@@ -9,6 +9,7 @@ while 1:
 	print '-------------------------'
 	print 'A - print all'
 	print 'G - get value'
+	print 'M - monitor value'
 	print 'S - set value'
 	print 'Z - set up auto'
 	print 'Q - quit'
@@ -50,7 +51,7 @@ while 1:
 			if dataType is 'Q':
 				continue
 
-			key = raw_input('Key:')
+			key = raw_input('Key: ')
 
 			if dataType is 'L':
 				print smashBoard.getLong(key)
@@ -61,6 +62,39 @@ while 1:
 			elif dataType is 'S':
 				print smashBoard.getString(key)
 				time.sleep(1)
+		elif command is 'M':
+			print '-------------------------'
+			print 'L - long'
+			print 'D - double'
+			print 'S - string'
+			print 'Q - quit'
+
+			dataType = raw_input(': ')
+
+			if dataType is 'Q':
+				continue
+
+			key = raw_input('Key: ')
+
+			if dataType is 'L':
+				smashBoardFunction = smashBoard.getLong
+			elif dataType is 'D':
+				smashBoardFunction = smashBoard.getDouble
+			elif dataType is 'S':
+				smashBoardFunction = smashBoard.getString
+
+			if not smashBoardFunction(key):
+				print 'Value does not exist'
+				time.sleep(1)
+				continue
+
+			try:
+				while 1:
+					print smashBoardFunction(key)
+					time.sleep(0.25)
+			except KeyboardInterrupt:
+				time.sleep(1)
+				continue
 		elif command is 'S':
 			print '-------------------------'
 			print 'L - long'
