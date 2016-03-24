@@ -18,7 +18,7 @@ class cvImgAnalysis:
         self.upperThresh = upperThresh
         self.minArea = minContourArea
         #subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
-        self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight)
+        self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight, armSideOffset=12)
 
     def getVertexData(self, coords):
         return self.targetTrig.getVertexData(coords)

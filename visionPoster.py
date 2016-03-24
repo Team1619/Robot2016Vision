@@ -2,6 +2,7 @@
 
 import time
 import base64
+import traceback
 
 import numpy
 import scipy
@@ -29,7 +30,7 @@ class VisionPoster:
 	self.socketTable.startUpdateThread()
         self.imageStreamer = ImageStreamer()
 	#self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
-        self.camera = cvImgAnalysis(0, numpy.uint8([56, 100, 25]), numpy.uint8([112, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
+        self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
         self.distanceStabilizer = Stabilizer(20, 10)
         #self.pivotalAngleStabilizer = Stabilizer(10, 7.5)
         self.centerXStabilizer = Stabilizer(4, 5)
@@ -45,7 +46,7 @@ class VisionPoster:
         flag, coordinates, centerX, _ = self.camera.getCoords(False, False, frame)
         if flag:
             try:
-                _, distance, _, angleOffsetToAligned, _, _, _, _ = self.camera.getVertexData(coordinates)
+                _, distance, angleOffsetToAligned, _, _, _, _ = self.camera.getVertexData(coordinates)
                 if self.distanceStabilizer.push(distance):
                     self.socketTable.setDouble('distance', self.distanceStabilizer.get())
                 #if self.pivotalAngleStabilizer.push(pivotalAngle):
@@ -56,11 +57,11 @@ class VisionPoster:
                 #if self.centerYStabilizer.push(centerY):
                 #    self.networkTable.putNumber('centerY', self.centerYStabilizer.get())
                 if self.angleOffsetToAlignedStabilizer.push(angleOffsetToAligned):
-                    adjustedAngleOffset = self.angleOffsetToAlignedStabilizer.get() - 3
-                    if adjustedAngleOffset < 0:
-                        adjustedAngleOffset += (0.7/25) * adjustedAngleOffset
-                    else:
-                        adjustedAngleOffset += (0.7/13) * adjustedAngleOffset
+                    adjustedAngleOffset = self.angleOffsetToAlignedStabilizer.get() - 2
+                    #if adjustedAngleOffset < 0:
+                    #    adjustedAngleOffset += (0.7/25) * adjustedAngleOffset
+                    #else:
+                    #    adjustedAngleOffset += (0.7/13) * adjustedAngleOffset
                     #print adjustedAngleOffset
                     self.socketTable.setDouble('angleOffsetToAligned', adjustedAngleOffset)
                 #if self.verticalAngleStabilizer.push(verticalAngle):
@@ -85,12 +86,24 @@ class VisionPoster:
         return image.tostring()
 
     def cleanUp(self):
+        print 'Cleaning'
         self.camera.release()
+        self.socketTable.cleanUp()
 
 
 if __name__ == '__main__':
     #time.sleep(10)
     poster = VisionPoster(640, 480, 732)
     while True:
-        poster.getFrame()
+        try:
+            poster.getFrame()
+        except KeyboardInterrupt as e:
+            print 'Keyboard Interrupt'
+            break
+        except Exception as e:
+            print str(e)
+            traceback.print_exc()
+            break
     poster.cleanUp()
+    
+    

@@ -1,6 +1,6 @@
 import math
 class vertexMath:
-	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 0.0, armHeight = 0, armSideOffset = 11.0):
+	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 36.25, armHeight = -1.5, armSideOffset = 12.0, cameraElevationAngle = -27.0, distToCenterOfRotation = 14.0):
 		self.magicConstant1 = 1.0068230038038
 		self.height = height*1.0
 		self.centerH = height/2*1.0
@@ -10,10 +10,13 @@ class vertexMath:
 		self.targetHeight = targetHeight*1.0
 		self.targetWidth = targetWidth*1.0
 		self.armLength = armLength*1.0
-		self.armHeight = armHeight*1.0
 		self.acceptableError = 0.001
 		self.desiredDistance = 100.0
+		self.armHeight = armHeight
 		self.armSideOffset = armSideOffset
+		self.cameraElevationAngle = cameraElevationAngle
+		self.distToCenterOfRotation = distToCenterOfRotation
+
 	
 	def setHeight(self, h):
 		self.height = h
@@ -26,7 +29,7 @@ class vertexMath:
 	def setFocalLength(self, l):
 		self.focalLength = l
 
-	def getVertexData(self, intCoords, armAngle=15.0):
+	def getVertexData(self, intCoords, armAngle=56.0):
 
 		accurate = True
 			
@@ -105,10 +108,10 @@ class vertexMath:
 		#print "horizontal", horizontalIRLVector
 		#print "vertical", verticalIRLVector, "\n"
 
-		upperRightVector = [self.focalLength, (self.getCameraXCoord(vertices[0][0]*1.0)), (self.getCameraYCoord(vertices[0][1]*1.0))]
-		lowerRightVector = [self.focalLength, (self.getCameraXCoord(vertices[1][0]*1.0)), (self.getCameraYCoord(vertices[1][1]*1.0))]
-		lowerLeftVector = [self.focalLength, (self.getCameraXCoord(vertices[2][0]*1.0)), (self.getCameraYCoord(vertices[2][1]*1.0))]
-		upperLeftVector = [self.focalLength, (self.getCameraXCoord(vertices[3][0]*1.0)), (self.getCameraYCoord(vertices[3][1]*1.0))]
+		upperRightVector = [self.focalLength, (self.getCameraXCoord(vertices[0][0])), (self.getCameraYCoord(vertices[0][1]))]
+		lowerRightVector = [self.focalLength, (self.getCameraXCoord(vertices[1][0])), (self.getCameraYCoord(vertices[1][1]))]
+		lowerLeftVector = [self.focalLength, (self.getCameraXCoord(vertices[2][0])), (self.getCameraYCoord(vertices[2][1]))]
+		upperLeftVector = [self.focalLength, (self.getCameraXCoord(vertices[3][0])), (self.getCameraYCoord(vertices[3][1]))]
 
 		#print "0-div check", upperLeftVector
 		#print "0-div check", lowerRightVector
@@ -190,10 +193,10 @@ class vertexMath:
 		lowerLeftIRLVector = [(lowerLeftVector[0]*qUL), (lowerLeftVector[1]*qUL), (lowerLeftVector[2]*qUL)]
 		upperLeftIRLVector = [(upperLeftVector[0]*qTL), (upperLeftVector[1]*qTL), (upperLeftVector[2]*qTL)]
 
-		upperRightIRLVector2 = [(upperRightVector[0]*qT2), (upperRightVector[1]*qT2), (upperRightVector[2]*qT2)]
-		lowerRightIRLVector2 = [(lowerRightVector[0]*qU2), (lowerRightVector[1]*qU2), (lowerRightVector[2]*qU2)]
-		lowerLeftIRLVector2 = [(lowerLeftVector[0]*qU1), (lowerLeftVector[1]*qU1), (lowerLeftVector[2]*qU1)]
-		upperLeftIRLVector2 = [(upperLeftVector[0]*qT1), (upperLeftVector[1]*qT1), (upperLeftVector[2]*qT1)]
+		#upperRightIRLVector2 = [(upperRightVector[0]*qT2), (upperRightVector[1]*qT2), (upperRightVector[2]*qT2)]
+		#lowerRightIRLVector2 = [(lowerRightVector[0]*qU2), (lowerRightVector[1]*qU2), (lowerRightVector[2]*qU2)]
+		#lowerLeftIRLVector2 = [(lowerLeftVector[0]*qU1), (lowerLeftVector[1]*qU1), (lowerLeftVector[2]*qU1)]
+		#upperLeftIRLVector2 = [(upperLeftVector[0]*qT1), (upperLeftVector[1]*qT1), (upperLeftVector[2]*qT1)]
 
 		upperLeftScalar = ((lowerLeftScalar*lowerLeftVector[2]) + verticalIRLVector[2])/upperLeftVector[2]
 		#if ((lowerLeftVector[0]*lowerLeftScalar + verticalIRLVector[0]) - (upperLeftVector[0]*upperLeftScalar) > self.acceptableError):
@@ -238,15 +241,15 @@ class vertexMath:
 		
 		#distanceToCenter = self.hypot3D(((upperRightIRLVector[0] + lowerRightIRLVector[0] + lowerLeftIRLVector[0] + upperLeftIRLVector[0])/4), ((upperRightIRLVector[1] + lowerRightIRLVector[1] + lowerLeftIRLVector[1] + upperLeftIRLVector[1])/4), ((upperRightIRLVector[2] + lowerRightIRLVector[2] + lowerLeftIRLVector[2] + upperLeftIRLVector[2])/4))
 
-		leftMidpoint = [(upperLeftIRLVector2[0] + lowerLeftIRLVector2[0])/2, (upperLeftIRLVector2[1] + lowerLeftIRLVector2[1])/2, (upperLeftIRLVector2[2] + lowerLeftIRLVector2[2])/2]
-		rightMidpoint = [(upperRightIRLVector2[0] + lowerRightIRLVector2[0])/2, (upperRightIRLVector2[1] + lowerRightIRLVector2[1])/2, (upperRightIRLVector2[2] + lowerRightIRLVector2[2])/2]
+		#leftMidpoint = [(upperLeftIRLVector2[0] + lowerLeftIRLVector2[0])/2, (upperLeftIRLVector2[1] + lowerLeftIRLVector2[1])/2, (upperLeftIRLVector2[2] + lowerLeftIRLVector2[2])/2]
+		#rightMidpoint = [(upperRightIRLVector2[0] + lowerRightIRLVector2[0])/2, (upperRightIRLVector2[1] + lowerRightIRLVector2[1])/2, (upperRightIRLVector2[2] + lowerRightIRLVector2[2])/2]
 		
 		#horizontalAngle = 90.0 - math.degrees(math.atan2(math.hypot((leftMidpoint[1]-rightMidpoint[1]), (leftMidpoint[2]-rightMidpoint[2])), (leftMidpoint[0]-rightMidpoint[0])))
 
 		#print [qTRError, qURError, qULError, qTLError]
 		#print distanceToCenter
 
-		horizontalAngle = 90.0 - math.degrees(math.atan2((rightMidpoint[1]-leftMidpoint[1]), (leftMidpoint[0]-rightMidpoint[0])))
+		#horizontalAngle = 90.0 - math.degrees(math.atan2((rightMidpoint[1]-leftMidpoint[1]), (leftMidpoint[0]-rightMidpoint[0])))
 
 		# print distanceToCenter
 
@@ -277,25 +280,32 @@ class vertexMath:
 		horizontalAngleToCenter = math.degrees(math.atan2((0-centralVector[1]), centralVector[0]))
 		verticalAngleToCenter = math.degrees(math.atan2((0-centralVector[2]), centralVector[0]))
 
-		#print accurate, distanceToCenter, horizontalAngle, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+		#print accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 
-                return accurate, distanceToCenter, horizontalAngle, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+                return accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 		
-		#robotPivotUpperRightVector = [(upperRightIRLVector[0] + self.armLength), (upperRightIRLVector[1]), (upperRightIRLVector[2] + self.armHeight)]
-		#robotPivotLowerRightVector = [(lowerRightIRLVector[0] + self.armLength), (lowerRightIRLVector[1]), (lowerRightIRLVector[2] + self.armHeight)]
-		#robotPivotLowerLeftVector = [(lowerLeftIRLVector[0] + self.armLength), (lowerLeftIRLVector[1]), (lowerLeftIRLVector[2] + self.armHeight)]
-		#robotPivotUpperLeftVector = [(upperLeftIRLVector[0] + self.armLength), (upperLeftIRLVector[1]), (upperLeftIRLVector[2] + self.armHeight)]
+		#robotPivotUpperRightVector = [(upperRightIRLVector[0] + self.armLength), (upperRightIRLVector[1]), (upperRightIRLVector[2])]
+		#robotPivotLowerRightVector = [(lowerRightIRLVector[0] + self.armLength), (lowerRightIRLVector[1]), (lowerRightIRLVector[2])]
+		#robotPivotLowerLeftVector = [(lowerLeftIRLVector[0] + self.armLength), (lowerLeftIRLVector[1]), (lowerLeftIRLVector[2])]
+		#robotPivotUpperLeftVector = [(upperLeftIRLVector[0] + self.armLength), (upperLeftIRLVector[1]), (upperLeftIRLVector[2])]
 		#robotPivotVertices = [
 		
 		#targetData = [length]
 		#return
 
 	def transformCoordinates(self, vertices, angle):
+		vertices2 = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
 		newVertices = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
 		for i in range(0,4):
-			vertexAngle = math.atan2(vertices[i][2], vertices[i][0]) + math.radians(angle)
+		
+			vertexAngle = math.atan2(vertices[i][2], vertices[i][0]) + math.radians(self.cameraElevationAngle)
 			vertexDistance = math.hypot(vertices[i][2], vertices[i][0])
-			newVertices[i] = [(math.cos(vertexAngle)*vertexDistance), vertices[i][1] + self.armSideOffset, (math.sin(vertexAngle)*vertexDistance)]
+			vertices2[i] = [(math.cos(vertexAngle)*vertexDistance) + self.armLength, vertices[i][1] + self.armSideOffset, (math.sin(vertexAngle)*vertexDistance) + self.armHeight]
+
+			vertexAngle2 = math.atan2(vertices2[i][2], vertices2[i][0]) + math.radians(angle)
+			vertexDistance2 = math.hypot(vertices2[i][2], vertices2[i][0])
+			newVertices[i] = [(math.cos(vertexAngle2)*vertexDistance2-self.distToCenterOfRotation), vertices2[i][1], (math.sin(vertexAngle2)*vertexDistance2)]
+
 		return newVertices
 
 	def getTargetPosition(self, realVertices):
@@ -313,8 +323,8 @@ class vertexMath:
 		#print a12, b12, c12
 		return targetPosition
 
-	def getAngleToCentralX(self, centerX):
-		return -math.degrees(math.atan2((centerX - self.centerW), self.focalLength))
+	#def getAngleToCentralX(self, centerX):
+	#	return -math.degrees(math.atan2((centerX - self.centerW), self.focalLength))
 
 	def getEquation(self, point0, point1):
 		m = 1000000000
@@ -357,10 +367,29 @@ class vertexMath:
 	def hypot3D(self, x, y, z):
 		return(math.sqrt(math.pow(x, 2) + math.pow(y, 2) + math.pow(z, 2)))
 
+	#def getArmAngleFromTicks(int ticks):
+	#	armInnerLength = 5.08725
+	#	armToDartBaseVertical = 9.3073849
+	#	armToDartBaseHorizontal = 13.47087978
+	#	dartWidth = 3.0
+	#	dartHeight = 12.0375-0.4423281995303814
+	#	armToDartLength = math.hypot(armToDartBaseHorizontal, armToDartBaseVertical)
+	#	armToDartDeclinationAngle = math.degrees(math.atan(armToDartBaseVertical/armToDartBaseHorizontal))
+	#	armPivotsToTopSurfaceAngle = 9.27
+	#	encoderTicksPerInch = 1024
+
+	#	dartExtention = ticks/encoderTicksPerInch
+
+	#	dartPivotLengthSquared = ((dartWidth*dartWidth)+((dartHeight+dartExtention)*((dartHeight+dartExtention)))
+	#	numerator = (((armLength*armLength) + (armToDartLength*armToDartLength)) - dartPivotLengthSquared)
+	#	denominator = 2.0*armLength*ArmToDartLength
+	#	triangleAngle = math.degrees(math.acos(numerator/denominator))
+	#	return((triangleAngle - armToDartDeclinationAngle) + armPivotsToTopSurfaceAngle)
+
 #trig = vertexMath(720, 1080, 1116, 7.65625, 3.828125)
 #trig.getVertexData([[110.0,641.0],[155.0,255.0],[897.0,295.0],[894.0,696.0]])
 
-targetTrig = vertexMath(640, 480, 732, 20.0, 14.0)
+#targetTrig = vertexMath(640, 480, 732, 20.0, 14.0)
 #targetTrig.getVertexData([[340,226],[340,254],[300,254],[300,226]])
-targetTrig.getVertexData([[467, 252], [471, 371], [279, 365], [292, 252]])
+#targetTrig.getVertexData([[467, 252], [471, 371], [279, 365], [292, 252]])
 #targetTrig.getAngleToCentralX(320-732)
