@@ -1,7 +1,7 @@
 import time
 from smashBoard import SmashBoard
 
-smashBoard = SmashBoard(host='192.168.1.170', port=5801)
+smashBoard = SmashBoard(port=5000)
 smashBoard.connect()
 smashBoard.startUpdateThread()
 print 'started update thread'
