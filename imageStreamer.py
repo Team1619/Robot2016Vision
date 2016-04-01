@@ -17,7 +17,7 @@ class ImageStreamer:
         self.socket.sendto(imageData + '\n', (self.host, self.port))
 
 if __name__ == '__main__':
-    streamer = ImageStreamer()
+    streamer = ImageStreamer(host='192.168.1.171', port=5802)
     cap = cv2.VideoCapture(0)
     assert cap.isOpened(), 'no cap'
     while True:
