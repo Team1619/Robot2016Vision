@@ -1,6 +1,7 @@
 
 import sys
 import traceback
+import errno
 
 import socket
 import json
@@ -27,7 +28,7 @@ class SmashBoard(WebSocketServerFactory):
     protocol = DriverStationProtocol
     BUFFER_SIZE = 4096
 
-    def __init__(self, url='ws://127.0.0.1:9000', host='localhost', port=1619):
+    def __init__(self, url='ws://127.0.0.1:5000', host='localhost', port=1619):
         WebSocketServerFactory.__init__(self, url)
         self.clients = []
 
@@ -52,7 +53,7 @@ class SmashBoard(WebSocketServerFactory):
             }) + '\n')
         self.socket.close()
 
-    def startUpdateThread(self):
+    def connectAndStartUpdateThread(self):
         self.runThread = True
         self.updateThread.start()
 
@@ -60,6 +61,7 @@ class SmashBoard(WebSocketServerFactory):
         if client not in self.clients:
             self.clients.append(client)
             print 'Registered client {}'.format(client.peer)
+            client.sendMessage(json.loads({'type':'connected'}), False)
 
     def unregister(self, client):
         if clients in self.clients:
@@ -89,12 +91,14 @@ class SmashBoard(WebSocketServerFactory):
 
         self.__send(message)
 
-    def connect(self):
+    def __connect(self):
         print 'Trying to connect to {}:{}'.format(self.host, self.port)
         try:
             self.socket.connect((self.host, self.port))
-        except:
-            traceback.print_exc()
+        except socket.error as e:
+            errorCode = e[0]
+            if errorCode != errno.ECONNREFUSED:
+                traceback.print_exc()
             print 'Not connected'
             self.socket.close()
             self.socket = socket.socket()
@@ -105,11 +109,11 @@ class SmashBoard(WebSocketServerFactory):
     # method which is target of updateThread
     def __listenOnSocket(self):
         while self.runThread:
-            while not self.connect() and self.runThread:
+            while not self.__connect() and self.runThread:
                 time.sleep(1)
             try:
                 for line in self.__readLines(self.socket, self.BUFFER_SIZE):
-                    print line
+                    #print line
                     data = json.loads(line)
                     try:
                         if data['type'] == 'updateLong':
@@ -190,21 +194,21 @@ class SmashBoard(WebSocketServerFactory):
 
 if __name__ == '__main__':
     smashBoard = SmashBoard(host='192.168.1.126', port=5801)
-    print 'Hello, balls deep'
-    smashBoard.startUpdateThread()
-    #loop = trollius.get_event_loop()
-    #coro = loop.create_server(smashBoard, '0.0.0.0', 9000)
-    #server = loop.run_until_complete(coro)
+    print 'Hello'
+    smashBoard.connectAndStartUpdateThread()
+    loop = trollius.get_event_loop()
+    coro = loop.create_server(smashBoard, '127.0.0.1', 5000)
+    server = loop.run_until_complete(coro)
 
 
     try:
-        while True:
-            time.sleep(1)
-        #loop.run_forever()
+        loop.run_forever()
+        #while 1:
+        #    time.sleep(1)
     except KeyboardInterrupt:
         pass
     finally:
+        server.close()
+        loop.close()
         smashBoard.cleanUp()
-        #server.close()
-        #loop.close()
-        print 'Goodbye, you bitch'
+        print 'Goodbye'

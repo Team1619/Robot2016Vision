@@ -13,9 +13,13 @@ sock.listen(1)
 conn, addr = sock.accept()
 print 'Accepted', str(conn), str(addr)
 
+i = 0
+
 while True:
     time.sleep(1)
     conn.send(json.dumps({'type':'updateString', 'key':'theString', 'value':'hi'}) + '\n')
+    conn.send(json.dumps({'type':'updateLong', 'key':'theLong', 'value':i}) + '\n')
+    i += 1
     print 'hi'
 
 conn.close()
