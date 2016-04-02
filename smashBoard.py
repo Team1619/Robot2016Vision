@@ -32,7 +32,7 @@ class SmashBoard(WebSocketServerFactory):
         self.clients = []
 
         self.socket = socket.socket()
-        self.socket.settimeout(1)
+        #self.socket.settimeout(1)
         self.host = host
         self.port = port
         self.longMap = {}
@@ -41,19 +41,8 @@ class SmashBoard(WebSocketServerFactory):
         self.updateThread = threading.Thread(target=self.__listenOnSocket)
         self.runThread = False
 
-
-    def connect(self):
-        print 'connecting to', self.host, self.port
-        try:
-            self.socket.connect((self.host, self.port))
-        except Exception as e:
-            traceback.print_exc()
-            return False
-        print 'connected'
-        return True
-
     def cleanUp(self):
-        print 'cleaning up'
+        print 'Cleaning up'
         print self.longMap, self.doubleMap, self.stringMap
         self.runThread = False
         while self.updateThread.isAlive():
@@ -100,27 +89,51 @@ class SmashBoard(WebSocketServerFactory):
 
         self.__send(message)
 
+    def connect(self):
+        print 'Trying to connect to {}:{}'.format(self.host, self.port)
+        try:
+            self.socket.connect((self.host, self.port))
+        except:
+            traceback.print_exc()
+            print 'Not connected'
+            self.socket.close()
+            self.socket = socket.socket()
+            return False
+        print 'Connected'
+        return True
+
     # method which is target of updateThread
     def __listenOnSocket(self):
-        for line in self.__readLines(self.socket, self.BUFFER_SIZE):
-            #print line
-            data = json.loads(line)
+        while self.runThread:
+            while not self.connect() and self.runThread:
+                time.sleep(1)
             try:
-                if data['type'] == 'updateLong':
-                    #print 'updated long: ' + data['key']
-                    self.longMap[data['key']] = data['value']
-                elif data['type'] == 'updateDouble':
-                    #print 'updated double: ' + data['key']
-                    self.doubleMap[data['key']] = data['value']
-                elif data['type'] == 'updateString':
-                    #print 'updated string: ' + data['key']
-                    self.stringMap[data['key']] = data['value']
-                elif data['type'] == 'currentValues':
-                    self.longMap = data['longs']
-                    self.doubleMap = data['doubles']
-                    self.stringMap = data['strings']
-            except:
-                print 'Data not in expected format or does not contain expected values: \n' + data
+                for line in self.__readLines(self.socket, self.BUFFER_SIZE):
+                    print line
+                    data = json.loads(line)
+                    try:
+                        if data['type'] == 'updateLong':
+                            #print 'updated long: ' + data['key']
+                            self.longMap[data['key']] = data['value']
+                        elif data['type'] == 'updateDouble':
+                            #print 'updated double: ' + data['key']
+                            self.doubleMap[data['key']] = data['value']
+                        elif data['type'] == 'updateString':
+                            #print 'updated string: ' + data['key']
+                            self.stringMap[data['key']] = data['value']
+                        elif data['type'] == 'currentValues':
+                            self.longMap = data['longs']
+                            self.doubleMap = data['doubles']
+                            self.stringMap = data['strings']
+                    except:
+                        traceback.print_exc()
+                        print 'Data not in expected format or does not contain expected values: \n' + data
+            except IOError:
+                traceback.print_exc()
+            finally:
+                self.socket.close()
+                self.socket = socket.socket()
+                print 'Disconnected from server'
         return
 
     def __readLines(self, socket, recvBuffer, delimiter='\n'):
@@ -135,6 +148,7 @@ class SmashBoard(WebSocketServerFactory):
                     line, buffer = buffer.split(delimiter, 1)
                     yield line
             except:
+                traceback.print_exc()
                 pass
         return
 
@@ -175,22 +189,22 @@ class SmashBoard(WebSocketServerFactory):
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard(host='10.16.19.2', port=1619)
+    smashBoard = SmashBoard(host='192.168.1.126', port=5801)
     print 'Hello, balls deep'
-    if not smashBoard.connect():
-        print 'Unable to connect'
-        sys.exit(1)
     smashBoard.startUpdateThread()
-    loop = trollius.get_event_loop()
-    coro = loop.create_server(smashBoard, '0.0.0.0', 9000)
-    server = loop.run_until_complete(coro)
+    #loop = trollius.get_event_loop()
+    #coro = loop.create_server(smashBoard, '0.0.0.0', 9000)
+    #server = loop.run_until_complete(coro)
+
 
     try:
-        loop.run_forever()
+        while True:
+            time.sleep(1)
+        #loop.run_forever()
     except KeyboardInterrupt:
         pass
     finally:
         smashBoard.cleanUp()
-        server.close()
-        loop.close()
+        #server.close()
+        #loop.close()
         print 'Goodbye, you bitch'
