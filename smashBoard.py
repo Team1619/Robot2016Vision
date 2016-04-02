@@ -11,7 +11,7 @@ import trollius
 
 import numbers
 
-class DriverStationProtocol(WebSocketServerProtocal):
+class DriverStationProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
         self.factory.register(self)
@@ -22,18 +22,12 @@ class DriverStationProtocol(WebSocketServerProtocal):
     def onClose(self, wasClean, code, reason):
         self.factory.unregister(self)
 
-class DriverStationFactory(WebSocketServerFactory):
-
-
-    def __init__(self, url):
-
-
 class SmashBoard(WebSocketServerFactory):
 
     protocol = DriverStationProtocol
     BUFFER_SIZE = 4096
 
-    def __init__(self, host='localhost', port=1619):
+    def __init__(self, url='ws://127.0.0.1:9000', host='localhost', port=1619):
         WebSocketServerFactory.__init__(self, url)
         self.clients = []
 
@@ -46,7 +40,6 @@ class SmashBoard(WebSocketServerFactory):
         self.stringMap = {}
         self.updateThread = threading.Thread(target=self.__listenOnSocket)
         self.runThread = False
-        self.factory = DriverStationFactory(u'ws://127.0.0.1:9000')
 
 
     def connect(self):
@@ -183,14 +176,13 @@ class SmashBoard(WebSocketServerFactory):
 
 if __name__ == '__main__':
     smashBoard = SmashBoard(host='10.16.19.2', port=1619)
-    #smashBoard = SmashBoard(port=8000)
     print 'Hello, balls deep'
     if not smashBoard.connect():
         print 'Unable to connect'
         sys.exit(1)
     smashBoard.startUpdateThread()
     loop = trollius.get_event_loop()
-    coro = loop.create_server(smashBoard.factory, '0.0.0.0', 9000)
+    coro = loop.create_server(smashBoard, '0.0.0.0', 9000)
     server = loop.run_until_complete(coro)
 
     try:
