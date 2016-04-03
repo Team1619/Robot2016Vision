@@ -41,6 +41,7 @@ class SmashBoard(WebSocketServerFactory):
         self.stringMap = {}
         self.updateThread = threading.Thread(target=self.__listenOnSocket)
         self.runThread = False
+        self.connected = False
 
     def cleanUp(self):
         print 'Cleaning up'
@@ -48,10 +49,6 @@ class SmashBoard(WebSocketServerFactory):
         self.runThread = False
         while self.updateThread.isAlive():
             pass
-        self.socket.sendall(json.dumps({
-            'type': 'disconnect'
-            }) + '\n')
-        self.socket.close()
 
     def connectAndStartUpdateThread(self):
         self.runThread = True
@@ -61,7 +58,12 @@ class SmashBoard(WebSocketServerFactory):
         if client not in self.clients:
             self.clients.append(client)
             print 'Registered client {}'.format(client.peer)
-            client.sendMessage(json.loads({'type':'connected'}), False)
+            if self.connected:
+                client.sendMessage(json.dumps({
+                    'type': 'robotConnected',
+                    'longs': self.longMap,
+                    'doubles': self.doubleMap,
+                    'strings': self.stringMap}), False)
 
     def unregister(self, client):
         if clients in self.clients:
@@ -102,14 +104,33 @@ class SmashBoard(WebSocketServerFactory):
             print 'Not connected'
             self.socket.close()
             self.socket = socket.socket()
+            self.connected = False
             return False
+        for client in self.clients:
+            client.sendMessage(json.dumps({
+                'type': 'robotConnected',
+                'longs': self.longMap,
+                'doubles': self.doubleMap,
+                'strings': self.stringMap}), False)
         print 'Connected'
+        self.connect = True
         return True
+
+    def __disconnect(self):
+        print 'Disconnecting'
+        self.connected = False
+        self.socket.sendall(json.dumps({
+            'type': 'disconnect'
+        }) + '\n')
+        for client in self.clients:
+            client.send(json.dumps({
+                'type': 'robotDisconnected'}), False)
+        self.socket.close()
 
     # method which is target of updateThread
     def __listenOnSocket(self):
         while self.runThread:
-            while not self.__connect() and self.runThread:
+            while self.runThread and not self.__connect():
                 time.sleep(1)
             try:
                 for line in self.__readLines(self.socket, self.BUFFER_SIZE):
@@ -132,12 +153,12 @@ class SmashBoard(WebSocketServerFactory):
                     except:
                         traceback.print_exc()
                         print 'Data not in expected format or does not contain expected values: \n' + data
-            except IOError:
-                traceback.print_exc()
+                self.__disconnect()
+            except:
+                pass
+                #traceback.print_exc()
             finally:
-                self.socket.close()
                 self.socket = socket.socket()
-                print 'Disconnected from server'
         return
 
     def __readLines(self, socket, recvBuffer, delimiter='\n'):
