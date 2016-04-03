@@ -15,6 +15,12 @@ print 'Accepted', str(conn), str(addr)
 
 i = 0
 
+conn.send(json.dumps({
+    'type': 'currentValues',
+    'longs': {'initLong': 1},
+    'doubles': {},
+    'strings': {'initString': 'lol'}}) + '\n')
+
 while True:
     time.sleep(1)
     conn.send(json.dumps({'type':'updateString', 'key':'theString', 'value':'hi'}) + '\n')

@@ -106,14 +106,8 @@ class SmashBoard(WebSocketServerFactory):
             self.socket = socket.socket()
             self.connected = False
             return False
-        for client in self.clients:
-            client.sendMessage(json.dumps({
-                'type': 'robotConnected',
-                'longs': self.longMap,
-                'doubles': self.doubleMap,
-                'strings': self.stringMap}), False)
         print 'Connected'
-        self.connect = True
+        self.connected = True
         return True
 
     def __disconnect(self):
@@ -150,6 +144,12 @@ class SmashBoard(WebSocketServerFactory):
                             self.longMap = data['longs']
                             self.doubleMap = data['doubles']
                             self.stringMap = data['strings']
+                            data['type'] = 'robotConnected'
+                        else:
+                            continue
+
+                        for client in self.clients:
+                            client.sendMessage(json.dumps(data), False)
                     except:
                         traceback.print_exc()
                         print 'Data not in expected format or does not contain expected values: \n' + data
