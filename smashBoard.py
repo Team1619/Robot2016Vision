@@ -113,12 +113,12 @@ class SmashBoard(WebSocketServerFactory):
     def __disconnect(self):
         print 'Disconnecting'
         self.connected = False
+        for client in self.clients:
+            client.sendMessage(json.dumps({
+                'type': 'robotDisconnected'}), False)
         self.socket.sendall(json.dumps({
             'type': 'disconnect'
         }) + '\n')
-        for client in self.clients:
-            client.send(json.dumps({
-                'type': 'robotDisconnected'}), False)
         self.socket.close()
 
     # method which is target of updateThread
@@ -214,7 +214,7 @@ class SmashBoard(WebSocketServerFactory):
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard(host='192.168.1.126', port=5801)
+    smashBoard = SmashBoard(host='127.0.0.1', port=5801)
     print 'Hello'
     smashBoard.connectAndStartUpdateThread()
     loop = trollius.get_event_loop()

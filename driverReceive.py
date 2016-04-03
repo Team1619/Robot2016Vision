@@ -5,7 +5,7 @@ import json
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.bind(('192.168.1.126', 5801))
+sock.bind(('127.0.0.1', 5801))
 
 print 'listening'
 sock.listen(1)
