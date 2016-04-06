@@ -1,3 +1,4 @@
+#up to date as of 4/5/16
 import math
 class vertexMath:
 	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 36.25, armHeight = -1.5, armSideOffset = 12.0, cameraElevationAngle = -27.0, distToCenterOfRotation = 14.0):
