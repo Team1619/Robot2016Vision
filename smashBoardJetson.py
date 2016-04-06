@@ -22,7 +22,7 @@ class SmashBoard:
         self.runThread = False
 
     def connect(self):
-        self.socket.connect_ex((self.host, self.port))
+        self.socket.connect((self.host, self.port))
 
     def cleanUp(self):
         print 'cleaning up'

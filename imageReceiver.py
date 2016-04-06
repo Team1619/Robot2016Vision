@@ -8,7 +8,7 @@ class ImageReceiver:
 
     BUFFER_SIZE = 65535
 
-    def __init__(self, host='10.16.19.33', port=5801):
+    def __init__(self, host='10.16.19.50', port=5802):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.host = host

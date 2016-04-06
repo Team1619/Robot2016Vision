@@ -1,8 +1,9 @@
 import time
-from smashBoard import SmashBoard
+from smashBoardJetson import SmashBoard
 
-smashBoard = SmashBoard(host='192.168.1.126', port=5801)
-smashBoard.connectAndStartUpdateThread()
+smashBoard = SmashBoard(host='10.16.19.2', port=1619)
+smashBoard.connect()
+smashBoard.startUpdateThread()
 print 'Started update thread'
 
 while 1:

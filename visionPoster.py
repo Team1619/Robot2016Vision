@@ -8,7 +8,7 @@ import numpy
 import cv2
 
 import netTable
-from smashBoard import SmashBoard
+from smashBoardJetson import SmashBoard
 from imageStreamer import ImageStreamer
 
 from vision import cvImgAnalysis
@@ -24,10 +24,10 @@ MIN_CONTOUR_AREA = 100
 class VisionPoster:
 
     def __init__(self, width, height, focalLength):
-        self.socketTable = SmashBoard(host='10.16.19.2')
+        self.socketTable = SmashBoard(host='10.16.19.2', port=1619)
         self.socketTable.connect()
         self.socketTable.startUpdateThread()
-        self.imageStreamer = ImageStreamer()
+        self.imageStreamer = ImageStreamer(host='10.16.19.50', port=5802)
         #self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
         self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
         self.distanceStabilizer = Stabilizer(20, 10)
