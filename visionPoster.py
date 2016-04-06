@@ -25,10 +25,10 @@ class VisionPoster:
 
     def __init__(self, width, height, focalLength):
         self.socketTable = SmashBoard(host='10.16.19.2')
-	    self.socketTable.connect()
-	    self.socketTable.startUpdateThread()
+        self.socketTable.connect()
+        self.socketTable.startUpdateThread()
         self.imageStreamer = ImageStreamer()
-	    #self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
+        #self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
         self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
         self.distanceStabilizer = Stabilizer(20, 10)
         #self.pivotalAngleStabilizer = Stabilizer(10, 7.5)
