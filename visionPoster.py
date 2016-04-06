@@ -5,7 +5,6 @@ import base64
 import traceback
 
 import numpy
-import scipy
 import cv2
 
 import netTable
