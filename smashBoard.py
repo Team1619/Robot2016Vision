@@ -28,12 +28,12 @@ class SmashBoard(WebSocketServerFactory):
     protocol = DriverStationProtocol
     BUFFER_SIZE = 4096
 
-    def __init__(self, url='ws://127.0.0.1:5000', host='localhost', port=1619):
+    def __init__(self, url='ws://127.0.0.1:5000', host='10.16.19.2', port=8501):
         WebSocketServerFactory.__init__(self, url)
         self.clients = []
 
         self.socket = socket.socket()
-        #self.socket.settimeout(1)
+        self.socket.settimeout(1)
         self.host = host
         self.port = port
         self.longMap = {}
@@ -66,7 +66,7 @@ class SmashBoard(WebSocketServerFactory):
                     'strings': self.stringMap}), False)
 
     def unregister(self, client):
-        if clients in self.clients:
+        if client in self.clients:
             self.clients.remove(client)
             print 'Unregistered client {}'.format(client.peer)
 
@@ -214,7 +214,7 @@ class SmashBoard(WebSocketServerFactory):
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard(host='127.0.0.1', port=5801)
+    smashBoard = SmashBoard(host='localhost', port=5801)
     print 'Hello'
     smashBoard.connectAndStartUpdateThread()
     loop = trollius.get_event_loop()
