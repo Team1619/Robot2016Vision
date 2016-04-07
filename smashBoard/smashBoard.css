@@ -1,0 +1,32 @@
+div#disconnected {
+  position: fixed;
+  top: calc(50% - 2em);
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+div#disconnected h1 {
+  color: #222;
+  margin: 0;
+  font-size: 5em;
+  font-weight: 200;
+}
+@font-family {
+  font-family: 'Lato';
+  src: url(db15ac7981b2d2897d1a3c22892b5a51.ttf);
+  font-weight: 200;
+}
+@font-family {
+  font-family: 'Lato';
+  src: url(5b761f2d1e4259ea6ac7ab3ebf7f3c49.ttf);
+  font-weight: 300;
+}
+@font-family {
+  font-family: 'Lato';
+  src: url(77d353744697c77955f9bacc7f3ed90a.ttf);
+  font-weight: 900;
+}
+html {
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+}
