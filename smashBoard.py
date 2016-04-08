@@ -32,8 +32,7 @@ class SmashBoard(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, url)
         self.clients = []
 
-        self.socket = socket.socket()
-        self.socket.settimeout(1)
+        self.__makeSocket()
         self.host = host
         self.port = port
         self.longMap = {}
@@ -93,17 +92,22 @@ class SmashBoard(WebSocketServerFactory):
 
         self.__send(message)
 
+    def __makeSocket(self):
+        self.socket = socket.socket()
+        self.socket.settimeout(3)
+
     def __connect(self):
         print 'Trying to connect to {}:{}'.format(self.host, self.port)
         try:
             self.socket.connect((self.host, self.port))
         except socket.error as e:
+            #print e[0]
             errorCode = e[0]
-            if errorCode != errno.ECONNREFUSED:
+            if not (errorCode == errno.ECONNREFUSED or errorCode == 'timed out' or errorCode == errno.ENETUNREACH):
                 traceback.print_exc()
             print 'Not connected'
             self.socket.close()
-            self.socket = socket.socket()
+            self.__makeSocket()
             self.connected = False
             return False
         print 'Connected'
@@ -158,7 +162,7 @@ class SmashBoard(WebSocketServerFactory):
                 pass
                 #traceback.print_exc()
             finally:
-                self.socket = socket.socket()
+                self.__makeSocket()
         return
 
     def __readLines(self, socket, recvBuffer, delimiter='\n'):
@@ -172,6 +176,8 @@ class SmashBoard(WebSocketServerFactory):
                 while buffer.find(delimiter) != -1:
                     line, buffer = buffer.split(delimiter, 1)
                     yield line
+            except socket.timeout:
+                return
             except:
                 traceback.print_exc()
                 pass
