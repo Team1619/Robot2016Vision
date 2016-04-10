@@ -19857,7 +19857,7 @@
 		_createClass(Socket, [{
 			key: 'connect',
 			value: function connect() {
-				this.socket = new WebSocket('ws://127.0.0.1:5000');
+				this.socket = new WebSocket('ws://127.0.0.1:9000');
 				this.socket.onopen = this._connected;
 				this.socket.onclose = this._disconnected;
 				this.socket.onmessage = this._message;
