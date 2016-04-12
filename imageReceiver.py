@@ -2,7 +2,7 @@
 import socket
 import time
 
-from flask import Flask, render_template, Response
+from flask import Flask, Response
 
 class ImageReceiver:
 
