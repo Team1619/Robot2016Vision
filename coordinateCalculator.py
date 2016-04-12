@@ -1,7 +1,7 @@
-#up to date as of 4/5/16
+#new camera calibration version 4/11/16
 import math
 class vertexMath:
-	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 36.25, armHeight = -1.5, armSideOffset = 12.0, cameraElevationAngle = -27.0, distToCenterOfRotation = 14.0):
+	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 30.00, armHeight = -14.75, armSideOffset = 5.25, cameraElevationAngle = -37.0, distToCenterOfRotation = 14.0):
 		self.magicConstant1 = 1.0068230038038
 		self.height = height*1.0
 		self.centerH = height/2*1.0
@@ -259,6 +259,8 @@ class vertexMath:
 		vertices3D = [upperRightIRLVector, lowerRightIRLVector, lowerLeftIRLVector, upperLeftIRLVector]
 		verticesT3D = self.transformCoordinates(vertices3D, armAngle)
 
+		focalCalibration = (vertices3D[0][0] + vertices3D[1][0] + vertices3D[2][0] + vertices3D[3][0])/4
+
 		centralVector = [((verticesT3D[0][0] + verticesT3D[1][0] + verticesT3D[2][0] + verticesT3D[3][0])/4), ((verticesT3D[0][1] + verticesT3D[1][1] + verticesT3D[2][1] + verticesT3D[3][1])/4), ((verticesT3D[0][2] + verticesT3D[1][2] + verticesT3D[2][2] + verticesT3D[3][2])/4)]
 
 		distanceToCenter = self.hypot3D(centralVector[0], centralVector[1], centralVector[2])
@@ -283,7 +285,8 @@ class vertexMath:
 
 		#print accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 
-                return accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+                #return accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+		return accurate, focalCalibration, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 		
 		#robotPivotUpperRightVector = [(upperRightIRLVector[0] + self.armLength), (upperRightIRLVector[1]), (upperRightIRLVector[2])]
 		#robotPivotLowerRightVector = [(lowerRightIRLVector[0] + self.armLength), (lowerRightIRLVector[1]), (lowerRightIRLVector[2])]
