@@ -1,3 +1,88 @@
+div#robot div#innerBallSensor,
+div#robot div#outerBallSensor {
+  display: inline-block;
+  width: calc(50% - 0.75em);
+  height: 2.5em;
+  margin: 0.75em 0.25em;
+  margin-left: 0.5em;
+}
+div#robot div#innerBallSensor.active {
+  background-color: #e74c3c;
+}
+div#robot div#outerBallSensor.active {
+  background-color: #3a9bdc;
+}
+div#robot img {
+  width: 100%;
+}
+div#value-display input {
+  display: block;
+  color: #fff;
+  width: 100%;
+  padding: 1.25em;
+  margin: 0;
+  margin-bottom: 1em;
+  background-color: #222;
+  border: none;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 1.25em;
+  font-weight: 300;
+  text-align: center;
+  box-sizing: border-box;
+}
+div#value-display div {
+  margin-bottom: 1em;
+}
+div#value-display div h2 {
+  color: #222;
+  width: 4em;
+  padding: 0.5em;
+  margin: 0 auto;
+  background-color: #ddd;
+  font-size: 1.25em;
+  font-weight: 300;
+}
+div#value-display div h3 {
+  color: #ddd;
+  padding: 0.5em;
+  margin: 0;
+  font-size: 1.125em;
+  font-weight: 300;
+}
+nav {
+  background-color: #fff;
+  text-align: center;
+}
+nav a {
+  display: inline-block;
+  color: #222;
+  width: 8em;
+  padding: 0.75em 0;
+  font-size: 1em;
+  font-weight: 300;
+  text-align: center;
+  text-decoration: none;
+}
+nav a.active {
+  background-color: #fafafa;
+}
+section#page {
+  text-align: center;
+}
+div#robot-disconnected {
+  position: fixed;
+  top: calc(50% - 2em);
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+div#robot-disconnected h1 {
+  color: #6abed8;
+  margin: 0;
+  font-size: 5em;
+  font-weight: 100;
+}
 div#disconnected {
   position: fixed;
   top: calc(50% - 2em);
@@ -6,15 +91,15 @@ div#disconnected {
           transform: translate(-50%, -50%);
 }
 div#disconnected h1 {
-  color: #222;
+  color: #6abed8;
   margin: 0;
   font-size: 5em;
-  font-weight: 200;
+  font-weight: 100;
 }
 @font-family {
   font-family: 'Lato';
   src: url(db15ac7981b2d2897d1a3c22892b5a51.ttf);
-  font-weight: 200;
+  font-weight: 100;
 }
 @font-family {
   font-family: 'Lato';
@@ -29,4 +114,8 @@ div#disconnected h1 {
 html {
   font-family: 'Lato', sans-serif;
   font-size: 16px;
+}
+body {
+  margin: 0;
+  background-color: #111;
 }

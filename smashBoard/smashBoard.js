@@ -64,7 +64,7 @@
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
 
-	__webpack_require__(183);
+	__webpack_require__(193);
 
 	_servicesSocket2['default'].connect();
 
@@ -19707,7 +19707,7 @@
 
 	var _componentsSmashBoard2 = _interopRequireDefault(_componentsSmashBoard);
 
-	__webpack_require__(179);
+	__webpack_require__(191);
 
 	var Connected = (function (_Component) {
 		_inherits(Connected, _Component);
@@ -19857,7 +19857,7 @@
 		_createClass(Socket, [{
 			key: 'connect',
 			value: function connect() {
-				this.socket = new WebSocket('ws://127.0.0.1:5000');
+				this.socket = new WebSocket('ws://127.0.0.1:9000');
 				this.socket.onopen = this._connected;
 				this.socket.onclose = this._disconnected;
 				this.socket.onmessage = this._message;
@@ -20396,9 +20396,11 @@
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
 
-	var _componentsValueDisplay = __webpack_require__(178);
+	var _componentsRouter = __webpack_require__(178);
 
-	var _componentsValueDisplay2 = _interopRequireDefault(_componentsValueDisplay);
+	var _componentsRouter2 = _interopRequireDefault(_componentsRouter);
+
+	__webpack_require__(189);
 
 	var SmashBoard = (function (_Component) {
 		_inherits(SmashBoard, _Component);
@@ -20430,14 +20432,14 @@
 		_createClass(SmashBoard, [{
 			key: 'render',
 			value: function render() {
-				return this.state.connected ? _react2['default'].createElement(
+				return this.state.connected ? _react2['default'].createElement(_componentsRouter2['default'], null) : _react2['default'].createElement(
 					'div',
-					null,
-					_react2['default'].createElement(_componentsValueDisplay2['default'], null)
-				) : _react2['default'].createElement(
-					'div',
-					null,
-					'Disconnected'
+					{ id: 'robot-disconnected' },
+					_react2['default'].createElement(
+						'h1',
+						null,
+						'Robot disconnected'
+					)
 				);
 			}
 		}, {
@@ -20484,6 +20486,109 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _componentsRobot = __webpack_require__(179);
+
+	var _componentsRobot2 = _interopRequireDefault(_componentsRobot);
+
+	var _componentsValueDisplay = __webpack_require__(184);
+
+	var _componentsValueDisplay2 = _interopRequireDefault(_componentsValueDisplay);
+
+	__webpack_require__(187);
+
+	var Router = (function (_Component) {
+		_inherits(Router, _Component);
+
+		function Router(props) {
+			var _this = this;
+
+			_classCallCheck(this, Router);
+
+			_get(Object.getPrototypeOf(Router.prototype), 'constructor', this).call(this, props);
+
+			this._changePage = function (event) {
+				var page = event.target.getAttribute('data-page');
+
+				if (page) {
+					_this.setState({
+						activePage: page
+					});
+				}
+			};
+
+			this.pages = {
+				dashboard: _react2['default'].createElement(_componentsRobot2['default'], null),
+				development: _react2['default'].createElement(_componentsValueDisplay2['default'], null)
+			};
+
+			this.state = {
+				activePage: 'dashboard'
+			};
+		}
+
+		_createClass(Router, [{
+			key: 'render',
+			value: function render() {
+				var activePage = this.state.activePage;
+
+				var page = this.pages[activePage];
+
+				return _react2['default'].createElement(
+					'div',
+					null,
+					_react2['default'].createElement(
+						'nav',
+						null,
+						_react2['default'].createElement(
+							'a',
+							{ href: '#', 'data-page': 'dashboard', className: activePage === 'dashboard' ? 'active' : '', onClick: this._changePage },
+							'Dashboard'
+						),
+						_react2['default'].createElement(
+							'a',
+							{ href: '#', 'data-page': 'development', className: activePage === 'development' ? 'active' : '', onClick: this._changePage },
+							'Development'
+						)
+					),
+					_react2['default'].createElement(
+						'section',
+						{ id: 'page' },
+						page
+					)
+				);
+			}
+		}]);
+
+		return Router;
+	})(_react.Component);
+
+	exports['default'] = Router;
+	module.exports = exports['default'];
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
 	var _servicesSocket = __webpack_require__(160);
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
@@ -20491,6 +20596,118 @@
 	var _servicesSmashBoard = __webpack_require__(176);
 
 	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
+
+	__webpack_require__(180);
+
+	var Robot = (function (_Component) {
+		_inherits(Robot, _Component);
+
+		function Robot(props) {
+			var _this = this;
+
+			_classCallCheck(this, Robot);
+
+			_get(Object.getPrototypeOf(Robot.prototype), 'constructor', this).call(this, props);
+
+			this._updateLong = function (key) {
+				switch (key) {
+					case 'outerBallSensor':
+						_this.setState({
+							outerBallSensor: Boolean(_servicesSmashBoard2['default'].getLong('outerBallSensor'))
+						});
+						break;
+					case 'innerBallSensor':
+						_this.setState({
+							innerBallSensor: Boolean(_servicesSmashBoard2['default'].getLong('innerBallSensor'))
+						});
+						break;
+				}
+			};
+
+			this.state = {
+				innerBallSensor: false,
+				outerBallSensor: false
+			};
+		}
+
+		_createClass(Robot, [{
+			key: 'render',
+			value: function render() {
+				var _state = this.state;
+				var innerBallSensor = _state.innerBallSensor;
+				var outerBallSensor = _state.outerBallSensor;
+
+				return _react2['default'].createElement(
+					'div',
+					{ id: 'robot' },
+					_react2['default'].createElement('div', { id: 'innerBallSensor', className: innerBallSensor ? 'active' : '' }),
+					_react2['default'].createElement('div', { id: 'outerBallSensor', className: outerBallSensor ? 'active' : '' }),
+					_react2['default'].createElement('img', { src: 'http://127.0.0.1:5000/video_feed' })
+				);
+			}
+		}, {
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				_servicesSocket2['default'].subscribe('updateLong', this._updateLong);
+
+				this._updateLong('innerBallSensor');
+				this._updateLong('outerBallSensor');
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				_servicesSocket2['default'].unsubscribe('updateLong', this._updateLong);
+			}
+		}]);
+
+		return Robot;
+	})(_react.Component);
+
+	exports['default'] = Robot;
+	module.exports = exports['default'];
+
+/***/ },
+/* 180 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _servicesSocket = __webpack_require__(160);
+
+	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
+
+	var _servicesSmashBoard = __webpack_require__(176);
+
+	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
+
+	__webpack_require__(185);
 
 	var ValueDisplay = (function (_Component) {
 		_inherits(ValueDisplay, _Component);
@@ -20656,7 +20873,7 @@
 				return _react2['default'].createElement(
 					'div',
 					{ id: 'value-display' },
-					_react2['default'].createElement('input', { type: 'text', placeholder: 'Search', onChange: this._search, ref: 'search' }),
+					_react2['default'].createElement('input', { type: 'text', placeholder: 'Filter', onChange: this._search, ref: 'search' }),
 					longsElement,
 					doublesElement,
 					stringsElement
@@ -20689,16 +20906,35 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 179 */
+/* 185 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */
+/* 186 */,
+/* 187 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 188 */,
+/* 189 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 190 */,
+/* 191 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 192 */,
+/* 193 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
