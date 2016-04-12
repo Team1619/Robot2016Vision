@@ -64,7 +64,7 @@
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
 
-	__webpack_require__(193);
+	__webpack_require__(199);
 
 	_servicesSocket2['default'].connect();
 
@@ -19707,7 +19707,7 @@
 
 	var _componentsSmashBoard2 = _interopRequireDefault(_componentsSmashBoard);
 
-	__webpack_require__(191);
+	__webpack_require__(197);
 
 	var Connected = (function (_Component) {
 		_inherits(Connected, _Component);
@@ -19857,7 +19857,7 @@
 		_createClass(Socket, [{
 			key: 'connect',
 			value: function connect() {
-				this.socket = new WebSocket('ws://127.0.0.1:9000');
+				this.socket = new WebSocket('ws://127.0.0.1:1619');
 				this.socket.onopen = this._connected;
 				this.socket.onclose = this._disconnected;
 				this.socket.onmessage = this._message;
@@ -20400,7 +20400,7 @@
 
 	var _componentsRouter2 = _interopRequireDefault(_componentsRouter);
 
-	__webpack_require__(189);
+	__webpack_require__(195);
 
 	var SmashBoard = (function (_Component) {
 		_inherits(SmashBoard, _Component);
@@ -20490,11 +20490,11 @@
 
 	var _componentsRobot2 = _interopRequireDefault(_componentsRobot);
 
-	var _componentsValueDisplay = __webpack_require__(184);
+	var _componentsValueDisplay = __webpack_require__(190);
 
 	var _componentsValueDisplay2 = _interopRequireDefault(_componentsValueDisplay);
 
-	__webpack_require__(187);
+	__webpack_require__(193);
 
 	var Router = (function (_Component) {
 		_inherits(Router, _Component);
@@ -20589,6 +20589,14 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _componentsHeading = __webpack_require__(180);
+
+	var _componentsHeading2 = _interopRequireDefault(_componentsHeading);
+
+	var _componentsGauge = __webpack_require__(185);
+
+	var _componentsGauge2 = _interopRequireDefault(_componentsGauge);
+
 	var _servicesSocket = __webpack_require__(160);
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
@@ -20597,7 +20605,7 @@
 
 	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
 
-	__webpack_require__(180);
+	__webpack_require__(188);
 
 	var Robot = (function (_Component) {
 		_inherits(Robot, _Component);
@@ -20609,7 +20617,7 @@
 
 			_get(Object.getPrototypeOf(Robot.prototype), 'constructor', this).call(this, props);
 
-			this._updateLong = function (key) {
+			this._updateValue = function (key) {
 				switch (key) {
 					case 'outerBallSensor':
 						_this.setState({
@@ -20621,12 +20629,28 @@
 							innerBallSensor: Boolean(_servicesSmashBoard2['default'].getLong('innerBallSensor'))
 						});
 						break;
+					case 'heading':
+						_this.setState({
+							heading: _servicesSmashBoard2['default'].getDouble('heading')
+						});
+					case 'distance':
+						_this.setState({
+							distance: _servicesSmashBoard2['default'].getDouble('distance') || 0
+						});
+						break;
+					case 'shooterSpeed':
+						_this.setState({
+							shooterSpeed: _servicesSmashBoard2['default'].getLong('shooterSpeed') || 0
+						});
 				}
 			};
 
 			this.state = {
 				innerBallSensor: false,
-				outerBallSensor: false
+				outerBallSensor: false,
+				heading: 0,
+				distance: 0,
+				shooterSpeed: 0
 			};
 		}
 
@@ -20636,27 +20660,41 @@
 				var _state = this.state;
 				var innerBallSensor = _state.innerBallSensor;
 				var outerBallSensor = _state.outerBallSensor;
+				var heading = _state.heading;
+				var distance = _state.distance;
+				var shooterSpeed = _state.shooterSpeed;
 
 				return _react2['default'].createElement(
 					'div',
 					{ id: 'robot' },
 					_react2['default'].createElement('div', { id: 'innerBallSensor', className: innerBallSensor ? 'active' : '' }),
 					_react2['default'].createElement('div', { id: 'outerBallSensor', className: outerBallSensor ? 'active' : '' }),
-					_react2['default'].createElement('img', { src: 'http://127.0.0.1:5000/video_feed' })
+					_react2['default'].createElement('img', { src: 'http://127.0.0.1:5000/video_feed' }),
+					_react2['default'].createElement(
+						'div',
+						{ className: 'values' },
+						_react2['default'].createElement(_componentsHeading2['default'], { heading: heading }),
+						_react2['default'].createElement(_componentsGauge2['default'], { title: 'Distance', maximum: 250, amount: distance }),
+						_react2['default'].createElement(_componentsGauge2['default'], { title: 'Shooter speed', maximum: 30000, amount: shooterSpeed })
+					)
 				);
 			}
 		}, {
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				_servicesSocket2['default'].subscribe('updateLong', this._updateLong);
+				_servicesSocket2['default'].subscribe('updateLong', this._updateValue);
+				_servicesSocket2['default'].subscribe('updateDouble', this._updateValue);
 
-				this._updateLong('innerBallSensor');
-				this._updateLong('outerBallSensor');
+				this._updateValue('innerBallSensor');
+				this._updateValue('outerBallSensor');
+				this._updateValue('heading');
+				this._updateValue('distance');
+				this._updateValue('shooterSpeed');
 			}
 		}, {
 			key: 'componentWillUnmount',
 			value: function componentWillUnmount() {
-				_servicesSocket2['default'].unsubscribe('updateLong', this._updateLong);
+				_servicesSocket2['default'].unsubscribe('updateLong', this._updateValue);
 			}
 		}]);
 
@@ -20668,15 +20706,155 @@
 
 /***/ },
 /* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	__webpack_require__(181);
+
+	var Heading = (function (_Component) {
+		_inherits(Heading, _Component);
+
+		function Heading() {
+			_classCallCheck(this, Heading);
+
+			_get(Object.getPrototypeOf(Heading.prototype), 'constructor', this).apply(this, arguments);
+		}
+
+		_createClass(Heading, [{
+			key: 'render',
+			value: function render() {
+				var heading = this.props.heading;
+
+				return _react2['default'].createElement('div', { className: 'heading', style: { transform: 'rotate(' + heading + 'deg)' } });
+			}
+		}], [{
+			key: 'propTypes',
+			value: {
+				heading: _react.PropTypes.number.isRequired
+			},
+			enumerable: true
+		}]);
+
+		return Heading;
+	})(_react.Component);
+
+	exports['default'] = Heading;
+	module.exports = exports['default'];
+
+/***/ },
+/* 181 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 181 */,
 /* 182 */,
 /* 183 */,
-/* 184 */
+/* 184 */,
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	__webpack_require__(186);
+
+	var Gauge = (function (_Component) {
+		_inherits(Gauge, _Component);
+
+		function Gauge() {
+			_classCallCheck(this, Gauge);
+
+			_get(Object.getPrototypeOf(Gauge.prototype), 'constructor', this).apply(this, arguments);
+		}
+
+		_createClass(Gauge, [{
+			key: 'render',
+			value: function render() {
+				var _props = this.props;
+				var title = _props.title;
+				var amount = _props.amount;
+				var maximum = _props.maximum;
+
+				return _react2['default'].createElement(
+					'div',
+					{ className: 'gauge' },
+					_react2['default'].createElement(
+						'h3',
+						null,
+						title
+					),
+					_react2['default'].createElement('div', { style: { width: Math.min(amount / maximum * 100, 100) + '%' } })
+				);
+			}
+		}], [{
+			key: 'propTypes',
+			value: {
+				title: _react.PropTypes.string.isRequired,
+				amount: _react.PropTypes.number.isRequired,
+				maximum: _react.PropTypes.number.isRequired
+			},
+			enumerable: true
+		}]);
+
+		return Gauge;
+	})(_react.Component);
+
+	exports['default'] = Gauge;
+	module.exports = exports['default'];
+
+/***/ },
+/* 186 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 187 */,
+/* 188 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 189 */,
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20707,7 +20885,7 @@
 
 	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
 
-	__webpack_require__(185);
+	__webpack_require__(191);
 
 	var ValueDisplay = (function (_Component) {
 		_inherits(ValueDisplay, _Component);
@@ -20906,27 +21084,6 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 185 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-/* 186 */,
-/* 187 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-/* 188 */,
-/* 189 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-/* 190 */,
 /* 191 */
 /***/ function(module, exports) {
 
@@ -20935,6 +21092,27 @@
 /***/ },
 /* 192 */,
 /* 193 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 194 */,
+/* 195 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 196 */,
+/* 197 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 198 */,
+/* 199 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
