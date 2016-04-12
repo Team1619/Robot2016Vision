@@ -20640,7 +20640,7 @@
 						break;
 					case 'shooterSpeed':
 						_this.setState({
-							shooterSpeed: _servicesSmashBoard2['default'].getLong('shooterSpeed') || 0
+							shooterSpeed: Math.abs(_servicesSmashBoard2['default'].getLong('shooterSpeed')) || 0
 						});
 				}
 			};
