@@ -17,11 +17,15 @@ class ImageReceiver:
         self.app = Flask(__name__)
         @self.app.route('/')
         def index():
-            return render_template('index.html')
+            return app.send_static_file('smashBoard/index.html')
 
         @self.app.route('/video_feed')
         def video_feed():
             return Response(self.gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        @self.app.route('/<path:path>')
+        def static_proxy(path):
+            return app.send_static_file('smashBoard/' + path)
 
     # takes plain image byte data
     def receiveImage(self):
