@@ -64,7 +64,7 @@
 
 	var _servicesSocket2 = _interopRequireDefault(_servicesSocket);
 
-	__webpack_require__(199);
+	__webpack_require__(202);
 
 	_servicesSocket2['default'].connect();
 
@@ -19707,7 +19707,7 @@
 
 	var _componentsSmashBoard2 = _interopRequireDefault(_componentsSmashBoard);
 
-	__webpack_require__(197);
+	__webpack_require__(200);
 
 	var Connected = (function (_Component) {
 		_inherits(Connected, _Component);
@@ -20400,7 +20400,7 @@
 
 	var _componentsRouter2 = _interopRequireDefault(_componentsRouter);
 
-	__webpack_require__(195);
+	__webpack_require__(198);
 
 	var SmashBoard = (function (_Component) {
 		_inherits(SmashBoard, _Component);
@@ -20490,11 +20490,11 @@
 
 	var _componentsRobot2 = _interopRequireDefault(_componentsRobot);
 
-	var _componentsValueDisplay = __webpack_require__(190);
+	var _componentsValueDisplay = __webpack_require__(193);
 
 	var _componentsValueDisplay2 = _interopRequireDefault(_componentsValueDisplay);
 
-	__webpack_require__(193);
+	__webpack_require__(196);
 
 	var Router = (function (_Component) {
 		_inherits(Router, _Component);
@@ -20589,11 +20589,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _componentsHeading = __webpack_require__(180);
+	var _componentsRanger = __webpack_require__(180);
+
+	var _componentsRanger2 = _interopRequireDefault(_componentsRanger);
+
+	var _componentsHeading = __webpack_require__(185);
 
 	var _componentsHeading2 = _interopRequireDefault(_componentsHeading);
 
-	var _componentsGauge = __webpack_require__(185);
+	var _componentsGauge = __webpack_require__(188);
 
 	var _componentsGauge2 = _interopRequireDefault(_componentsGauge);
 
@@ -20605,7 +20609,7 @@
 
 	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
 
-	__webpack_require__(188);
+	__webpack_require__(191);
 
 	var Robot = (function (_Component) {
 		_inherits(Robot, _Component);
@@ -20633,6 +20637,7 @@
 						_this.setState({
 							heading: _servicesSmashBoard2['default'].getDouble('heading')
 						});
+						break;
 					case 'distance':
 						_this.setState({
 							distance: _servicesSmashBoard2['default'].getDouble('distance') || 0
@@ -20642,6 +20647,12 @@
 						_this.setState({
 							shooterSpeed: Math.abs(_servicesSmashBoard2['default'].getLong('shooterSpeed')) || 0
 						});
+						break;
+					case 'shotRange':
+						_this.setState({
+							shotRange: _servicesSmashBoard2['default'].getLong('shotRange') || 0
+						});
+						break;
 				}
 			};
 
@@ -20650,7 +20661,8 @@
 				outerBallSensor: false,
 				heading: 0,
 				distance: 0,
-				shooterSpeed: 0
+				shooterSpeed: 0,
+				shotRange: 0
 			};
 		}
 
@@ -20663,6 +20675,7 @@
 				var heading = _state.heading;
 				var distance = _state.distance;
 				var shooterSpeed = _state.shooterSpeed;
+				var shotRange = _state.shotRange;
 
 				return _react2['default'].createElement(
 					'div',
@@ -20674,6 +20687,7 @@
 						'div',
 						{ className: 'values' },
 						_react2['default'].createElement(_componentsHeading2['default'], { heading: heading }),
+						_react2['default'].createElement(_componentsRanger2['default'], { shotRange: shotRange }),
 						_react2['default'].createElement(_componentsGauge2['default'], { title: 'Distance', maximum: 250, amount: distance }),
 						_react2['default'].createElement(_componentsGauge2['default'], { title: 'Shooter speed', maximum: 30000, amount: shooterSpeed })
 					)
@@ -20690,6 +20704,7 @@
 				this._updateValue('heading');
 				this._updateValue('distance');
 				this._updateValue('shooterSpeed');
+				this._updateValue('shotRange');
 			}
 		}, {
 			key: 'componentWillUnmount',
@@ -20730,34 +20745,41 @@
 
 	__webpack_require__(181);
 
-	var Heading = (function (_Component) {
-		_inherits(Heading, _Component);
+	var Ranger = (function (_Component) {
+		_inherits(Ranger, _Component);
 
-		function Heading() {
-			_classCallCheck(this, Heading);
+		function Ranger() {
+			_classCallCheck(this, Ranger);
 
-			_get(Object.getPrototypeOf(Heading.prototype), 'constructor', this).apply(this, arguments);
+			_get(Object.getPrototypeOf(Ranger.prototype), 'constructor', this).apply(this, arguments);
 		}
 
-		_createClass(Heading, [{
+		_createClass(Ranger, [{
 			key: 'render',
 			value: function render() {
-				var heading = this.props.heading;
+				var shotRange = this.props.shotRange;
 
-				return _react2['default'].createElement('div', { className: 'heading', style: { transform: 'rotate(' + heading + 'deg)' } });
+				return _react2['default'].createElement(
+					'div',
+					{ className: 'ranger' },
+					_react2['default'].createElement('div', { className: shotRange == 1 ? 'active' : '' }),
+					_react2['default'].createElement('div', { className: shotRange == 2 ? 'active' : '' }),
+					_react2['default'].createElement('div', { className: shotRange == 3 ? 'active' : '' }),
+					_react2['default'].createElement('div', { className: shotRange == 4 ? 'active' : '' })
+				);
 			}
 		}], [{
 			key: 'propTypes',
 			value: {
-				heading: _react.PropTypes.number.isRequired
+				shotRange: _react.PropTypes.number.isRequired
 			},
 			enumerable: true
 		}]);
 
-		return Heading;
+		return Ranger;
 	})(_react.Component);
 
-	exports['default'] = Heading;
+	exports['default'] = Ranger;
 	module.exports = exports['default'];
 
 /***/ },
@@ -20794,6 +20816,69 @@
 	var _react2 = _interopRequireDefault(_react);
 
 	__webpack_require__(186);
+
+	var Heading = (function (_Component) {
+		_inherits(Heading, _Component);
+
+		function Heading() {
+			_classCallCheck(this, Heading);
+
+			_get(Object.getPrototypeOf(Heading.prototype), 'constructor', this).apply(this, arguments);
+		}
+
+		_createClass(Heading, [{
+			key: 'render',
+			value: function render() {
+				var heading = this.props.heading;
+
+				return _react2['default'].createElement('div', { className: 'heading', style: { transform: 'rotate(' + heading + 'deg)' } });
+			}
+		}], [{
+			key: 'propTypes',
+			value: {
+				heading: _react.PropTypes.number.isRequired
+			},
+			enumerable: true
+		}]);
+
+		return Heading;
+	})(_react.Component);
+
+	exports['default'] = Heading;
+	module.exports = exports['default'];
+
+/***/ },
+/* 186 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 187 */,
+/* 188 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	__webpack_require__(189);
 
 	var Gauge = (function (_Component) {
 		_inherits(Gauge, _Component);
@@ -20840,21 +20925,21 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 186 */
+/* 189 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 187 */,
-/* 188 */
+/* 190 */,
+/* 191 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 189 */,
-/* 190 */
+/* 192 */,
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20885,7 +20970,7 @@
 
 	var _servicesSmashBoard2 = _interopRequireDefault(_servicesSmashBoard);
 
-	__webpack_require__(191);
+	__webpack_require__(194);
 
 	var ValueDisplay = (function (_Component) {
 		_inherits(ValueDisplay, _Component);
@@ -21084,35 +21169,35 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 191 */
+/* 194 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 192 */,
-/* 193 */
+/* 195 */,
+/* 196 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 194 */,
-/* 195 */
+/* 197 */,
+/* 198 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 196 */,
-/* 197 */
+/* 199 */,
+/* 200 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 198 */,
-/* 199 */
+/* 201 */,
+/* 202 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin

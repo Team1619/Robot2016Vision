@@ -1,3 +1,16 @@
+div.ranger {
+  max-width: 25em;
+  margin: 1em auto;
+  background-color: #222;
+}
+div.ranger div {
+  display: inline-block;
+  width: 25%;
+  height: 2.5em;
+}
+div.ranger div.active {
+  background-color: #1abc9c;
+}
 div.heading {
   position: relative;
   width: 10em;
