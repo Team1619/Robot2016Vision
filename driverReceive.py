@@ -1,6 +1,8 @@
 import socket
 import time
 
+import random
+
 import json
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,14 +19,17 @@ i = 0
 
 conn.send(json.dumps({
     'type': 'currentValues',
-    'longs': {'initLong': 1},
+    'longs': {},
     'doubles': {},
-    'strings': {'initString': 'lol'}}) + '\n')
+    'strings': {}}) + '\n')
 
 while True:
     time.sleep(1)
-    conn.send(json.dumps({'type':'updateString', 'key':'theString', 'value':'hi'}) + '\n')
-    conn.send(json.dumps({'type':'updateLong', 'key':'theLong', 'value':i}) + '\n')
+    conn.send(json.dumps({'type':'updateLong', 'key':'innerBallSensor', 'value':random.randrange(0, 2)}) + '\n')
+    conn.send(json.dumps({'type':'updateLong', 'key':'outerBallSensor', 'value':random.randrange(0, 2)}) + '\n')
+    conn.send(json.dumps({'type':'updateDouble', 'key':'heading', 'value':round(random.random() * 360, 3)}) + '\n')
+    conn.send(json.dumps({'type':'updateDouble', 'key':'distance', 'value':round(random.random() * 250, 3)}) + '\n')
+    conn.send(json.dumps({'type':'updateLong', 'key':'shooterSpeed', 'value':random.randrange(0, 30001)}) + '\n')
     i += 1
     print 'hi'
 

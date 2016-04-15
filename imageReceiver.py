@@ -2,7 +2,7 @@
 import socket
 import time
 
-from flask import Flask, render_template, Response
+from flask import Flask, Response
 
 class ImageReceiver:
 
@@ -17,11 +17,15 @@ class ImageReceiver:
         self.app = Flask(__name__)
         @self.app.route('/')
         def index():
-            return render_template('index.html')
+            return self.app.send_static_file('index.html')
 
         @self.app.route('/video_feed')
         def video_feed():
             return Response(self.gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        @self.app.route('/<path:path>')
+        def static_proxy(path):
+            return self.app.send_static_file(path)
 
     # takes plain image byte data
     def receiveImage(self):
