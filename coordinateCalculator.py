@@ -1,4 +1,4 @@
-#new camera calibration version 4/11/16
+#new camera calibrations complete 4/11/16 9:00
 import math
 class vertexMath:
 	def __init__(self, width, height, focalLength, targetWidth=5, targetHeight=10, armLength = 30.00, armHeight = -14.75, armSideOffset = 5.25, cameraElevationAngle = -37.0, distToCenterOfRotation = 14.0):
@@ -285,8 +285,8 @@ class vertexMath:
 
 		#print accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 
-                #return accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
-		return accurate, focalCalibration, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+                return accurate, distanceToCenter, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
+		#return accurate, focalCalibration, horizontalAngleToCenter, verticalAngleToCenter, distanceToTargetPosition, angleToTargetPosition, [qTRError, qURError, qULError, qTLError]
 		
 		#robotPivotUpperRightVector = [(upperRightIRLVector[0] + self.armLength), (upperRightIRLVector[1]), (upperRightIRLVector[2])]
 		#robotPivotLowerRightVector = [(lowerRightIRLVector[0] + self.armLength), (lowerRightIRLVector[1]), (lowerRightIRLVector[2])]

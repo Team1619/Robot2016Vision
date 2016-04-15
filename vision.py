@@ -7,7 +7,7 @@ import time
 class cvImgAnalysis:
     CAMERA_COMMAND = 'v4l2-ctl -c exposure_auto=1 -c exposure_absolute=5 -c backlight_compensation=0 -c sharpness=50 -c brightness=30 -c contrast=5'
 
-    def __init__(self, cam, lowerThresh, upperThresh, imgWidth, imgHeight, focal, realWidth, realHeight, minContourArea):
+    def __init__(self, cam, lowerThresh, upperThresh, imgWidth, imgHeight, focal, realWidth, realHeight, minContourArea, edgeThreshold):
         self.cap = cv2.VideoCapture(cam)
         assert self.cap.isOpened(), 'No cam'
         #while not self.cap.isOpened():
@@ -17,6 +17,9 @@ class cvImgAnalysis:
         self.lowerThresh = lowerThresh
         self.upperThresh = upperThresh
         self.minArea = minContourArea
+        self.imgWidth = imgWidth
+        self.imgHeight = imgHeight
+        self.edgeThreshold = edgeThreshold
         #subprocess.check_call(self.CAMERA_COMMAND.split(), shell=False)
         self.targetTrig = vertexMath(imgWidth, imgHeight, focal, realWidth, realHeight, armSideOffset=12)
 
@@ -30,9 +33,7 @@ class cvImgAnalysis:
             self.drawContours(img, [cont], displayCam=False)
         elif displayCam:
             self.drawContours(img, [cont], displayCam=True)
-        if self.checkContour(cont):
-            return (True, self.sortCoords(cont, True, printVals=printVals), self.getCenterX(cont), self.getCenterY(cont))
-        return False, [0], -1, -1
+        return (self.checkContour(cont), np.reshape(cont, (-1, 2)).tolist(), self.getCenterX(cont), self.getCenterY(cont))
 
     def sortCoords(self, cont, clockWise=False, printVals=False):
         coords = np.reshape(cont, (4, 2)).tolist()
@@ -45,7 +46,24 @@ class cvImgAnalysis:
         return coords
 
     def checkContour(self, cont):
-        return cont.shape[0] == 4 and cv2.contourArea(cont) > self.minArea
+        #print cont.shape
+        booleanList = [cont.shape[0] == 4 and cv2.contourArea(cont) > self.minArea]
+        booleanList.extend(self.checkEdges(cont.tolist()))
+        #print booleanList
+        return booleanList
+
+    def checkEdges(self, cont):
+        nearEdges = [False, False, False]
+
+        for point in cont:
+            if point[0][0] <= self.edgeThreshold:
+                nearEdges[0] = True
+            if point[0][0] >= self.imgWidth - self.edgeThreshold:
+                nearEdges[1] = True
+            if point[0][1] <= self.edgeThreshold:
+                nearEdges[2] = True
+
+        return nearEdges
 
     def coordsCompare(self, point1, point2):
         return point1[1] - point2[1] if point1[1] - point2[1] else point1[0] - point2[0]
@@ -59,12 +77,16 @@ class cvImgAnalysis:
             cv2.imwrite('contImg.png', img)
 
     def getCenterX(self, cont):
-        moment = cv2.moments(cont)
-        return int(moment['m10']/moment['m00'])
+        if cont.shape[0] == 4 and cv2.contourArea(cont) > self.minArea:
+            moment = cv2.moments(cont)
+            return int(moment['m10']/moment['m00'])
+        return 0
 
     def getCenterY(self, cont):
-        moment = cv2.moments(cont)
-        return int(moment['m01']/moment['m00'])
+        if cont.shape[0] == 4 and cv2.contourArea(cont) > self.minArea:
+            moment = cv2.moments(cont)
+            return int(moment['m01']/moment['m00'])
+        return 0
 
     def getAngleOffsetToAlignedCG(self, centerX):
         return self.targetTrig.getAngleToCentralX(centerX)

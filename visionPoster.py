@@ -24,12 +24,14 @@ MIN_CONTOUR_AREA = 250
 class VisionPoster:
 
     def __init__(self, width, height, focalLength):
-        self.socketTable = SmashBoard(host='10.16.19.2', port=1619)
+        self.socketTable = SmashBoard(host='10.16.19.2', port=5801)
         self.socketTable.connect()
         self.socketTable.startUpdateThread()
         self.imageStreamer = ImageStreamer(host='10.16.19.50', port=5802)
         #self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
-        self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA)
+        self.imgWidth = width
+        self.imgHeight = height
+        self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA, 3)
         self.distanceStabilizer = Stabilizer(20, 10)
         #self.pivotalAngleStabilizer = Stabilizer(10, 7.5)
         self.centerXStabilizer = Stabilizer(4, 5)
@@ -42,8 +44,8 @@ class VisionPoster:
     def getFrame(self):
         frame = self.camera.readFrame()
         #frame = numpy.array(frame[::-1, ::-1, :])
-        flag, coordinates, centerX, _ = self.camera.getCoords(False, False, frame)
-        if flag:
+        flags, coordinates, centerX, _ = self.camera.getCoords(False, False, frame)
+        if flags[0]:
             try:
                 _, distance, angleOffsetToAligned, _, _, _, _ = self.camera.getVertexData(coordinates)
                 if self.distanceStabilizer.push(distance):
@@ -71,13 +73,24 @@ class VisionPoster:
                 #    self.networkTable.putNumber('angleToOptimal', self.angleToOptimalStabilizer.get())
             except ZeroDivisionError:
                 print('Divide by zero error')
-        self.socketTable.setLong('contourFound', int(flag))
-        #self.socketTable.setString('image', self.getSmashBoardImage(flag, coordinates, frame))
-        self.imageStreamer.sendImage(self.getSmashBoardImage(flag, coordinates, frame))
+        self.socketTable.setLong('contourFound', int(flags[0]))
+        self.socketTable.setLong('contourGood', int(flags[0] and not (flags[1] or flags[2] or flags[3])))
+        self.socketTable.setLong('contourLeft', int(flags[1]))
+        self.socketTable.setLong('contourRight', int(flags[2]))
+        self.socketTable.setLong('contourTop', int(flags[3]))
+        #self.socketTable.setString('image', self.getSmashBoardImage(flags[0], coordinates, frame))
+        self.imageStreamer.sendImage(self.getSmashBoardImage(flags, coordinates, frame))
 
-    def getSmashBoardImage(self, flag, coordinates, frame):
-        if flag:
+    def getSmashBoardImage(self, flags, coordinates, frame):
+        if flags[0] or flags[1] or flags[2] or flags[3]:
             self.camera.drawContours(frame, [numpy.array(coordinates).reshape((-1, 1, 2))], displayCam=False)
+            if flags[0] and flags[1]:
+                cv2.line(frame, (0,0), (0,self.imgHeight), (0,0,255), thickness=10)
+            if flags[0] and flags[2]:
+                cv2.line(frame, (self.imgWidth,0), (self.imgWidth,self.imgHeight), (0,0,255), thickness=10)
+            if flags[0] and flags[3]:
+                cv2.line(frame, (0,0), (self.imgWidth,0), (0,0,255), thickness=10)
+
         frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         #frame = cv2.multiply(frame, numpy.array([CONTRAST_SCALE]))
         #frame = cv2.add(frame, BRIGHTNESS_INCREASE)
