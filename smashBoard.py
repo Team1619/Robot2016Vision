@@ -229,7 +229,7 @@ class SmashBoard(WebSocketServerFactory):
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard(host='localhost')
+    smashBoard = SmashBoard()
     print 'Hello'
     smashBoard.connectAndStartUpdateThread()
     loop = trollius.get_event_loop()
