@@ -17,8 +17,19 @@ class DriverStationProtocol(WebSocketServerProtocol):
     def onOpen(self):
         self.factory.register(self)
 
-    def onMessage(self, payLoad):
-        self.factory.fuckYourselfAndYourDonkey()
+    def onMessage(self, payLoad, isBinary):
+        message = json.loads(payLoad)
+
+        if message['type'] == 'updateAutoLane':
+            lane = message['value']
+            if lane >= 0 and lane <= 5:
+                self.factory.fuckYourselfAndYourDonkeyAndYourAutoLane()
+                print 'This is on you, Daniel'
+        elif message['type'] == 'updateAutoDefense':
+            defense = message['value']
+            if defense >= 0 and defense <= 6:
+                self.factory.fuckYourselfAndYourDonkeyAndYourAutoDefenseEspeciallyIfItIsTheChevalleDeFrise()
+                print 'This is on you, Daniel'
 
     def onClose(self, wasClean, code, reason):
         self.factory.unregister(self)
