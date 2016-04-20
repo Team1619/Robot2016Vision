@@ -29,3 +29,9 @@ Session.vim
 # temporary
 .netrwhist
 *~
+
+### Node ###
+# Logs
+logs
+*.log
+npm-debug.log*
