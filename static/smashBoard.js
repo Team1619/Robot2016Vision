@@ -21012,30 +21012,53 @@
 			this._updateValue = function (key) {
 				switch (key) {
 					case 'autoLane':
-						_this.setState({
-							lane: _servicesSmashBoard2['default'].getLong('autoLane')
-						});
+						var lane = _servicesSmashBoard2['default'].getLong('autoLane');
+
+						if (lane || lane === 0) {
+							_this.setState({
+								lane: lane
+							});
+						}
 						break;
 					case 'autoDefense':
-						_this.setState({
-							defense: _servicesSmashBoard2['default'].getLong('autoDefense')
-						});
+						var defense = _servicesSmashBoard2['default'].getLong('autoDefense');
+
+						if (defense || defense === 0) {
+							_this.setState({
+								defense: defense
+							});
+						}
 						break;
 				}
 			};
 
 			this._laneChanged = function (event) {
 				var lane = parseInt(event.target.value);
+				var currentLane = _this.state.lane;
+				var currentDefense = _this.state.defense;
 
-				if (lane || lane === 0) {
+				if (lane === 0) {
+					_servicesSocket2['default'].updateAutoLane(0);
+					_servicesSocket2['default'].updateAutoDefense(0);
+				} else if (lane === 1) {
+					_servicesSocket2['default'].updateAutoLane(1);
+					_servicesSocket2['default'].updateAutoDefense(1);
+				} else if (!currentLane) {
 					_servicesSocket2['default'].updateAutoLane(lane);
+					_servicesSocket2['default'].updateAutoDefense(2);
+				} else {
+					_servicesSocket2['default'].updateAutoLane(lane);
+					if (currentDefense === 1) {
+						_servicesSocket2['default'].updateAutoDefense(2);
+					}
 				}
 			};
 
 			this._defenseChanged = function (event) {
 				var defense = parseInt(event.target.value);
+				var lane = _this.state.lane;
 
-				if (defense || defense === 0) {
+				if (defense && lane !== 1 && defense !== 1) {
 					_servicesSocket2['default'].updateAutoDefense(defense);
 				}
 			};
@@ -21057,76 +21080,86 @@
 					'div',
 					{ id: 'autonomous' },
 					_react2['default'].createElement(
-						'select',
-						{ onChange: this._laneChanged, value: '' + lane },
+						'form',
+						null,
 						_react2['default'].createElement(
-							'option',
-							{ value: '0' },
-							'No autonomous'
+							'h3',
+							null,
+							'Lane'
 						),
 						_react2['default'].createElement(
-							'option',
-							{ value: '1' },
-							'Lane 1'
+							'h3',
+							null,
+							'Defense'
 						),
 						_react2['default'].createElement(
-							'option',
-							{ value: '2' },
-							'Lane 2'
+							'select',
+							{ onChange: this._laneChanged, value: '' + lane },
+							_react2['default'].createElement(
+								'option',
+								{ value: '0' },
+								'No autonomous'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '1' },
+								'Lane 1'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '2' },
+								'Lane 2'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '3' },
+								'Lane 3'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '4' },
+								'Lane 4'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '5' },
+								'Lane 5'
+							)
 						),
 						_react2['default'].createElement(
-							'option',
-							{ value: '3' },
-							'Lane 3'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '4' },
-							'Lane 4'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '5' },
-							'Lane 5'
-						)
-					),
-					_react2['default'].createElement(
-						'select',
-						{ onChange: this._defenseChanged, value: '' + defense },
-						_react2['default'].createElement(
-							'option',
-							{ value: '0' },
-							'No autonomous'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '1' },
-							'Low bar'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '2' },
-							'Rock wall'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '3' },
-							'Rough terrain'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '4' },
-							'Moat'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '5' },
-							'Ramparts'
-						),
-						_react2['default'].createElement(
-							'option',
-							{ value: '6' },
-							'Chevalle de frise'
+							'select',
+							{ onChange: this._defenseChanged, value: '' + defense, disabled: lane === 0 },
+							_react2['default'].createElement('option', { value: '0' }),
+							_react2['default'].createElement(
+								'option',
+								{ value: '1' },
+								'Low bar'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '2' },
+								'Rock wall'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '3' },
+								'Rough terrain'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '4' },
+								'Moat'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '5' },
+								'Ramparts'
+							),
+							_react2['default'].createElement(
+								'option',
+								{ value: '6' },
+								'Chevalle de frise'
+							)
 						)
 					)
 				);
@@ -21135,6 +21168,9 @@
 			key: 'componentWillMount',
 			value: function componentWillMount() {
 				_servicesSocket2['default'].subscribe('updateLong', this._updateValue);
+
+				this._updateValue('autoLane');
+				this._updateValue('autoDefense');
 			}
 		}, {
 			key: 'componentWillUnmount',
