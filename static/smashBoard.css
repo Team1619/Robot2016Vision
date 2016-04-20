@@ -85,6 +85,10 @@ div#robot div.values {
   margin: 0.75em;
   text-align: center;
 }
+div#autonomous select {
+  display: block;
+  box-sizing: border-box;
+}
 div#value-display input {
   display: block;
   color: #fff;
