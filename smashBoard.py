@@ -23,13 +23,11 @@ class DriverStationProtocol(WebSocketServerProtocol):
         if message['type'] == 'updateAutoLane':
             lane = message['value']
             if lane >= 0 and lane <= 5:
-                self.factory.fuckYourselfAndYourDonkeyAndYourAutoLane()
-                print 'This is on you, Daniel'
+                self.factory.setLong('autoLane', lane)
         elif message['type'] == 'updateAutoDefense':
             defense = message['value']
             if defense >= 0 and defense <= 6:
-                self.factory.fuckYourselfAndYourDonkeyAndYourAutoDefenseEspeciallyIfItIsTheChevalleDeFrise()
-                print 'This is on you, Daniel'
+                self.factory.setLong('autoDefense', defense)
 
     def onClose(self, wasClean, code, reason):
         self.factory.unregister(self)
@@ -136,7 +134,7 @@ class SmashBoard(WebSocketServerFactory):
         }) + '\n')
         self.socket.close()
 
-    # method which is target of updateThread
+    # method which is target of Thread
     def __listenOnSocket(self):
         while self.runThread:
             while self.runThread and not self.__connect():
@@ -231,7 +229,7 @@ class SmashBoard(WebSocketServerFactory):
             print 'Key: ' + key + ' does not exist in stringMap'
 
 if __name__ == '__main__':
-    smashBoard = SmashBoard()
+    smashBoard = SmashBoard(host='localhost')
     print 'Hello'
     smashBoard.connectAndStartUpdateThread()
     loop = trollius.get_event_loop()
