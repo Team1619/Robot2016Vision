@@ -8,8 +8,10 @@ flag, frame = cap.read()
 
 loop = True
 
-lower_thresh = np.array([0, 0, 0], dtype=np.uint8)
-upper_thresh = np.array([180, 255, 255], dtype=np.uint8)
+lower_thresh = np.array([56, 100, 25], dtype=np.uint8)
+upper_thresh = np.array([112, 255, 255], dtype=np.uint8)
+upper_2 = np.array([0,0,240], dtype=np.uint8)
+lower_2 = np.array([180, 255, 255], dtype=np.uint8)
 chooseMode = 0
 adjustVal = 10
 
@@ -59,13 +61,14 @@ while loop:
     flag, frame = cap.read()
     assert flag, 'No frame'
 
-    frame = np.array(frame[::-1, ::-1, :])
-
     blurFrame = cv2.GaussianBlur(frame, (5, 5), 0)
     hsv = cv2.cvtColor(blurFrame, cv2.COLOR_BGR2HSV)
 
 
     mask = cv2.inRange(hsv, lower_thresh, upper_thresh)
+    mask2 = cv2.inRange(hsv, lower_2, upper_2)
+
+    mask = cv2.bitwise_or(mask, mask2)
 
     maskedFrame = cv2.bitwise_and(blurFrame, blurFrame, mask=mask)
 

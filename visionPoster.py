@@ -19,7 +19,7 @@ GOAL_WIDTH = 20.0
 GOAL_HEIGHT = 12.0
 CONTRAST_SCALE = 1.0
 BRIGHTNESS_INCREASE = 0
-MIN_CONTOUR_AREA = 250
+MIN_CONTOUR_AREA = 625
 
 class VisionPoster:
 
@@ -27,18 +27,16 @@ class VisionPoster:
         self.socketTable = SmashBoard(host='10.16.19.2', port=5801)
         self.socketTable.connect()
         self.socketTable.startUpdateThread()
-        self.imageStreamer = ImageStreamer(host='10.16.19.50', port=5802)
+        self.imageStreamer = ImageStreamer(host='10.16.19.5', port=5802)
         #self.networkTable = netTable.makeNetworkTable('roborio-1619-frc.local', 'SmashBoard')
         self.imgWidth = width
         self.imgHeight = height
         self.camera = cvImgAnalysis(0, numpy.uint8([60, 80, 90]), numpy.uint8([90, 255, 255]), width, height, focalLength, GOAL_WIDTH, GOAL_HEIGHT, MIN_CONTOUR_AREA, 3)
-        self.distanceStabilizer = Stabilizer(20, 10)
         #self.pivotalAngleStabilizer = Stabilizer(10, 7.5)
         self.centerXStabilizer = Stabilizer(4, 5)
         #self.centerYStabilizer = Stabilizer(4, 5)
         #self.distanceToOptimalStabilizer = Stabilizer(10, 7.5)
         #self.angleToOptimalStabilizer = Stabilizer(10, 10)
-        self.angleOffsetToAlignedStabilizer = Stabilizer(2, 5)
         #self.verticalAngleStabilizer = Stabilizer(10, 5)
 
     def getFrame(self):
@@ -48,23 +46,15 @@ class VisionPoster:
         if flags[0]:
             try:
                 _, distance, angleOffsetToAligned, _, _, _, _ = self.camera.getVertexData(coordinates)
-                if self.distanceStabilizer.push(distance):
-                    self.socketTable.setDouble('distance', self.distanceStabilizer.get())
-                #if self.pivotalAngleStabilizer.push(pivotalAngle):
+                self.socketTable.setDouble('distance', distance)
+		#if self.pivotalAngleStabilizer.push(pivotalAngle):
                 #    self.networkTable.putNumber('pivotalAngle', self.pivotalAngleStabilizer.get())
                 if self.centerXStabilizer.push(centerX):
                     self.socketTable.setLong('centerX', self.centerXStabilizer.get())
                 #    self.networkTable.putNumber('angleOffsetToAlignedCG', self.camera.getAngleOffsetToAlignedCG(centerX))
                 #if self.centerYStabilizer.push(centerY):
                 #    self.networkTable.putNumber('centerY', self.centerYStabilizer.get())
-                if self.angleOffsetToAlignedStabilizer.push(angleOffsetToAligned):
-                    adjustedAngleOffset = self.angleOffsetToAlignedStabilizer.get()
-                    #if adjustedAngleOffset < 0:
-                    #    adjustedAngleOffset += (0.7/25) * adjustedAngleOffset
-                    #else:
-                    #    adjustedAngleOffset += (0.7/13) * adjustedAngleOffset
-                    #print adjustedAngleOffset
-                    self.socketTable.setDouble('angleOffsetToAligned', adjustedAngleOffset)
+                self.socketTable.setDouble('angleOffsetToAligned', angleOffsetToAligned)
                 #if self.verticalAngleStabilizer.push(verticalAngle):
                 #    self.networkTable.putNumber('verticalAngle', self.verticalAngleStabilizer.get())
                 #if self.distanceToOptimalStabilizer.push(distanceToOptimal):
